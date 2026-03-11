@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}New Quiz — Nerd Quiz{% endblock %}
+
+{% block content %}
+{% include "includes/wizard_steps.html" with current_step=1 %}
+
+<div style="max-width:520px; margin:0 auto;">
+    <h1 style="margin-bottom:1.5rem;">Quiz Details</h1>
+
+    <div class="card">
+        <form method="post" style="display:flex; flex-direction:column; gap:1.2rem;">
+            {% csrf_token %}
+            {% for field in form %}
+            <div style="display:flex; flex-direction:column; gap:0.35rem;">
+                <label for="{{ field.id_for_label }}" style="font-weight:600; font-size:0.9rem;">
+                    {{ field.label }}{% if field.field.required %} <span style="color:var(--orange);">*</span>{% endif %}
+                </label>
+                {{ field }}
+                {% if field.errors %}
+                <ul style="list-style:none; color:#A63232; font-size:0.85rem;">
+                    {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div style="display:flex; gap:0.75rem; justify-content:flex-end; margin-top:0.5rem;">
+                <a href="{% url 'homepage' %}" class="btn btn-outline">Cancel</a>
+                <button type="submit" class="btn btn-primary">Next: Categories &rarr;</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}{{ block.super }}
+<style>
+    input[type="text"], input[type="date"], textarea, select {
+        width: 100%; padding: 0.55rem 0.75rem;
+        border: 2px solid #E0DAD4; border-radius: 8px;
+        font-size: 0.95rem; font-family: inherit;
+        transition: border-color 0.15s;
+    }
+    input[type="text"]:focus, input[type="date"]:focus, textarea:focus, select:focus {
+        outline: none; border-color: var(--orange);
+    }
+    textarea { resize: vertical; min-height: 80px; }
+</style>
+{% endblock %}

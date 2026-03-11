@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Questions — {{ quiz.name }}{% endblock %}
+
+{% block content %}
+{% include "includes/wizard_steps.html" with current_step=3 %}
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:start;">
+
+    <!-- ── Add question form ── -->
+    <div>
+        <h1 style="margin-bottom:0.25rem;">Add Question</h1>
+        <p style="color:var(--muted); margin-bottom:1.5rem;">{{ quiz.name }}</p>
+
+        <div class="card">
+            <form method="post" enctype="multipart/form-data" style="display:flex; flex-direction:column; gap:1.1rem;">
+                {% csrf_token %}
+
+                {% for field in form %}
+                <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                    <label for="{{ field.id_for_label }}" style="font-weight:600; font-size:0.88rem;">
+                        {{ field.label }}{% if field.field.required %} <span style="color:var(--orange);">*</span>{% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.errors %}
+                    <ul style="list-style:none; color:#A63232; font-size:0.82rem;">
+                        {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <!-- Multiple choice options (shown/hidden via JS) -->
+                <div id="choices-section" style="display:none; flex-direction:column; gap:0.5rem;">
+                    <p style="font-weight:600; font-size:0.88rem;">Answer choices</p>
+                    {{ choice_formset.management_form }}
+                    {% for cf in choice_formset %}
+                    <div>{{ cf.text }}</div>
+                    {% endfor %}
+                </div>
+
+                <div style="display:flex; gap:0.75rem; justify-content:flex-end; margin-top:0.5rem;">
+                    <button type="submit" name="add" class="btn btn-secondary">+ Add Question</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── Questions added so far ── -->
+    <div>
+        <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:1.5rem;">
+            <h2 style="color:var(--dark);">Questions added</h2>
+            <span style="color:var(--muted); font-size:0.85rem;">{{ questions|length }} so far</span>
+        </div>
+
+        {% if questions %}
+        {% regroup questions by category as by_category %}
+        {% for group in by_category %}
+        <div style="margin-bottom:1.25rem;">
+            <p style="font-weight:700; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em;
+                      color:var(--orange); margin-bottom:0.5rem;">{{ group.grouper }}</p>
+            <div style="display:flex; flex-direction:column; gap:0.5rem;">
+                {% for q in group.list %}
+                <div class="card" style="padding:0.75rem 1rem; font-size:0.9rem;">
+                    <div style="display:flex; justify-content:space-between; gap:0.5rem;">
+                        <span>{{ q.text|truncatechars:80 }}</span>
+                        <span style="white-space:nowrap; font-size:0.8rem; color:var(--muted);">{{ q.base_points }} pts</span>
+                    </div>
+                    <span style="font-size:0.78rem; color:var(--muted);">{{ q.get_answer_type_display }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="card" style="text-align:center; padding:2rem; color:var(--muted);">
+            No questions yet
+        </div>
+        {% endif %}
+
+        <form method="post" style="margin-top:1.5rem; text-align:right;">
+            {% csrf_token %}
+            <button type="submit" name="finish" class="btn btn-primary">Finish &amp; Save Quiz ✓</button>
+        </form>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_css %}{{ block.super }}
+<style>
+    input[type="text"], input[type="number"], input[type="url"], textarea, select {
+        width: 100%; padding: 0.5rem 0.7rem;
+        border: 2px solid #E0DAD4; border-radius: 8px;
+        font-size: 0.9rem; font-family: inherit;
+        transition: border-color 0.15s;
+    }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--orange); }
+    textarea { resize: vertical; min-height: 70px; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const typeSelect = document.getElementById('id_answer_type');
+    const choicesSection = document.getElementById('choices-section');
+
+    function toggleChoices() {
+        choicesSection.style.display =
+            typeSelect.value === 'multiple_choice' ? 'flex' : 'none';
+    }
+
+    typeSelect.addEventListener('change', toggleChoices);
+    toggleChoices();
+</script>
+{% endblock %}

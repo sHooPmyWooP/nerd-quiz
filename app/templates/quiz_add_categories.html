@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Categories — {{ quiz.name }}{% endblock %}
+
+{% block content %}
+{% include "includes/wizard_steps.html" with current_step=2 %}
+
+<div style="max-width:520px; margin:0 auto;">
+    <h1 style="margin-bottom:0.25rem;">Categories</h1>
+    <p style="color:var(--muted); margin-bottom:1.5rem;">{{ quiz.name }}</p>
+
+    <div class="card">
+        <form method="post" style="display:flex; flex-direction:column; gap:1rem;">
+            {% csrf_token %}
+            {{ formset.management_form }}
+
+            <div id="category-rows" style="display:flex; flex-direction:column; gap:0.75rem;">
+                {% for form in formset %}
+                <div class="category-row" style="display:flex; align-items:center; gap:0.75rem;">
+                    {{ form.id }}
+                    {# Keep DELETE checkbox but hide it — JS will check it when trash is clicked #}
+                    <div style="display:none;">{{ form.DELETE }}</div>
+                    <div style="flex:1;">
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <ul style="list-style:none; color:#A63232; font-size:0.82rem; margin-top:0.2rem;">
+                            {% for error in form.name.errors %}<li>{{ error }}</li>{% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                    <button type="button" class="trash-btn" aria-label="Remove category">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
+                            <path d="M10 11v6M14 11v6"/>
+                        </svg>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+
+            <button type="button" id="add-category" class="btn btn-outline" style="align-self:flex-start;">
+                + Add category
+            </button>
+
+            {% if formset.non_form_errors %}
+            <p style="color:#A63232; font-size:0.85rem;">{{ formset.non_form_errors }}</p>
+            {% endif %}
+
+            <div style="display:flex; gap:0.75rem; justify-content:flex-end; margin-top:0.5rem;">
+                <a href="{% url 'quiz_create' %}" class="btn btn-outline">&larr; Back</a>
+                <button type="submit" class="btn btn-primary">Next: Questions &rarr;</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<template id="empty-row">
+    <div class="category-row" style="display:flex; align-items:center; gap:0.75rem;">
+        <input type="hidden" name="categories-__prefix__-id" id="id_categories-__prefix__-id">
+        <input type="hidden" name="categories-__prefix__-DELETE" value="">
+        <div style="flex:1;">
+            <input type="text" name="categories-__prefix__-name" maxlength="200"
+                   placeholder="Category name" id="id_categories-__prefix__-name">
+        </div>
+        <button type="button" class="trash-btn" aria-label="Remove category">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
+                <path d="M10 11v6M14 11v6"/>
+            </svg>
+        </button>
+    </div>
+</template>
+{% endblock %}
+
+{% block extra_css %}{{ block.super }}
+<style>
+    input[type="text"] {
+        width: 100%; padding: 0.55rem 0.75rem;
+        border: 2px solid #E0DAD4; border-radius: 8px;
+        font-size: 0.95rem; font-family: inherit;
+        transition: border-color 0.15s;
+    }
+    input[type="text"]:focus { outline: none; border-color: var(--green); }
+
+    .trash-btn {
+        flex-shrink: 0;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.3rem;
+        border-radius: 6px;
+        color: var(--muted);
+        transition: color 0.15s, background 0.15s;
+        display: flex;
+        align-items: center;
+    }
+    .trash-btn:hover { color: #E05555; background: #FFF0F0; }
+    .trash-btn svg   { width: 18px; height: 18px; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function bindTrash(btn) {
+        btn.addEventListener('click', function () {
+            const row = btn.closest('.category-row');
+            const deleteInput = row.querySelector('input[name$="-DELETE"]');
+            if (deleteInput && row.querySelector('input[name$="-id"]').value) {
+                // Saved row: mark for deletion and hide visually
+                deleteInput.value = 'on';
+                row.style.opacity = '0.35';
+                row.style.pointerEvents = 'none';
+            } else {
+                // Unsaved row: just remove from DOM
+                row.remove();
+            }
+        });
+    }
+
+    document.querySelectorAll('.trash-btn').forEach(bindTrash);
+
+    function addRow() {
+        const totalForms = document.getElementById('id_categories-TOTAL_FORMS');
+        const index = parseInt(totalForms.value);
+
+        const template = document.getElementById('empty-row').innerHTML
+            .replaceAll('__prefix__', index);
+
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = template;
+        const row = wrapper.firstElementChild;
+        bindTrash(row.querySelector('.trash-btn'));
+        document.getElementById('category-rows').appendChild(row);
+
+        totalForms.value = index + 1;
+        row.querySelector('input[type="text"]').focus();
+    }
+
+    document.getElementById('add-category').addEventListener('click', addRow);
+
+    // Start with one empty row if there are no existing categories
+    if (document.querySelectorAll('.category-row').length === 0) addRow();
+</script>
+{% endblock %}

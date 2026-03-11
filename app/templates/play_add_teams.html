@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Teams — {{ session.quiz.name }}{% endblock %}
+
+{% block content %}
+<div style="max-width:520px; margin:0 auto;">
+    <h1 style="margin-bottom:0.25rem;">Add Teams</h1>
+    <p style="color:var(--muted); margin-bottom:1.5rem;">{{ session.quiz.name }}</p>
+
+    <div class="card">
+        <form method="post" style="display:flex; flex-direction:column; gap:1rem;">
+            {% csrf_token %}
+            {{ formset.management_form }}
+
+            <div id="team-rows" style="display:flex; flex-direction:column; gap:0.75rem;">
+                {% for form in formset %}
+                <div class="team-row" style="display:flex; align-items:center; gap:0.75rem;">
+                    {{ form.id }}
+                    <div style="display:none;">{{ form.DELETE }}</div>
+                    <div style="flex:1;">
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <ul style="list-style:none; color:#A63232; font-size:0.82rem; margin-top:0.2rem;">
+                            {% for error in form.name.errors %}<li>{{ error }}</li>{% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                    <button type="button" class="trash-btn" aria-label="Remove team">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
+                            <path d="M10 11v6M14 11v6"/>
+                        </svg>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+
+            <button type="button" id="add-team" class="btn btn-outline" style="align-self:flex-start;">
+                + Add team
+            </button>
+
+            {% if formset.non_form_errors %}
+            <p style="color:#A63232; font-size:0.85rem;">{{ formset.non_form_errors }}</p>
+            {% endif %}
+
+            <div style="display:flex; gap:0.75rem; justify-content:flex-end; margin-top:0.5rem;">
+                <a href="{% url 'homepage' %}" class="btn btn-outline">Cancel</a>
+                <button type="submit" class="btn btn-primary">Start Quiz &rarr;</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<template id="empty-row">
+    <div class="team-row" style="display:flex; align-items:center; gap:0.75rem;">
+        <input type="hidden" name="teams-__prefix__-id" id="id_teams-__prefix__-id">
+        <input type="hidden" name="teams-__prefix__-DELETE" value="">
+        <div style="flex:1;">
+            <input type="text" name="teams-__prefix__-name" maxlength="200"
+                   placeholder="Team name" id="id_teams-__prefix__-name">
+        </div>
+        <button type="button" class="trash-btn" aria-label="Remove team">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
+                <path d="M10 11v6M14 11v6"/>
+            </svg>
+        </button>
+    </div>
+</template>
+{% endblock %}
+
+{% block extra_css %}{{ block.super }}
+<style>
+    input[type="text"] {
+        width: 100%; padding: 0.55rem 0.75rem;
+        border: 2px solid #E0DAD4; border-radius: 8px;
+        font-size: 0.95rem; font-family: inherit;
+        transition: border-color 0.15s;
+    }
+    input[type="text"]:focus { outline: none; border-color: var(--orange); }
+
+    .trash-btn {
+        flex-shrink: 0; background: none; border: none; cursor: pointer;
+        padding: 0.3rem; border-radius: 6px; color: var(--muted);
+        transition: color 0.15s, background 0.15s; display: flex; align-items: center;
+    }
+    .trash-btn:hover { color: #E05555; background: #FFF0F0; }
+    .trash-btn svg   { width: 18px; height: 18px; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function bindTrash(btn) {
+        btn.addEventListener('click', function () {
+            const row = btn.closest('.team-row');
+            const deleteInput = row.querySelector('input[name$="-DELETE"]');
+            if (deleteInput && row.querySelector('input[name$="-id"]').value) {
+                deleteInput.value = 'on';
+                row.style.opacity = '0.35';
+                row.style.pointerEvents = 'none';
+            } else {
+                row.remove();
+            }
+        });
+    }
+
+    document.querySelectorAll('.trash-btn').forEach(bindTrash);
+
+    function addRow() {
+        const totalForms = document.getElementById('id_teams-TOTAL_FORMS');
+        const index = parseInt(totalForms.value);
+
+        const template = document.getElementById('empty-row').innerHTML
+            .replaceAll('__prefix__', index);
+
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = template;
+        const row = wrapper.firstElementChild;
+        bindTrash(row.querySelector('.trash-btn'));
+        document.getElementById('team-rows').appendChild(row);
+
+        totalForms.value = index + 1;
+        row.querySelector('input[type="text"]').focus();
+    }
+
+    document.getElementById('add-team').addEventListener('click', addRow);
+
+    if (document.querySelectorAll('.team-row').length === 0) addRow();
+</script>
+{% endblock %}

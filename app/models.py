@@ -10,12 +10,20 @@ class Quiz(models.Model):
         return self.name
 
 
+class Category(models.Model):
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='categories')
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
+
+
 class Question(models.Model):
     class AnswerType(models.TextChoices):
         MULTIPLE_CHOICE = 'multiple_choice', 'Multiple Choice'
         TEXT = 'text', 'Text'
 
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='questions')
     text = models.TextField()
     answer_type = models.CharField(max_length=20, choices=AnswerType.choices)
     base_points = models.PositiveIntegerField(default=100)
@@ -25,6 +33,22 @@ class Question(models.Model):
 
     def __str__(self):
         return self.text[:80]
+
+
+class GameSession(models.Model):
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='sessions')
+    started_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.quiz.name} — {self.started_at:%Y-%m-%d %H:%M}"
+
+
+class Team(models.Model):
+    session = models.ForeignKey(GameSession, on_delete=models.CASCADE, related_name='teams')
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
 
 
 class Choice(models.Model):
