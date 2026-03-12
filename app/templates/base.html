@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Nerd Quiz{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%231A1A2E'/><text x='16' y='23' font-family='system-ui,sans-serif' font-size='22' font-weight='900' text-anchor='middle' fill='%23FF6B2B'>?</text></svg>">
     <style>
         :root {
             --orange:        #FF6B2B;
@@ -198,7 +199,7 @@
     </a>
     <nav>
         {% block nav %}
-        <a href="/">Home</a>
+        <a href="/">Übersicht</a>
         {% endblock %}
     </nav>
 </header>
@@ -216,7 +217,7 @@
 </main>
 
 <footer>
-    Nerd Quiz &mdash; may the nerdiest win
+    Nerd Quiz &mdash; möge der Nerdigste gewinnen
 </footer>
 
 {% block extra_js %}{% endblock %}

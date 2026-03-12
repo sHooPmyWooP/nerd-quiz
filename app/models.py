@@ -4,7 +4,6 @@ from django.db import models
 class Quiz(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    date = models.DateField()
 
     def __str__(self):
         return self.name
@@ -19,13 +18,8 @@ class Category(models.Model):
 
 
 class Question(models.Model):
-    class AnswerType(models.TextChoices):
-        MULTIPLE_CHOICE = 'multiple_choice', 'Multiple Choice'
-        TEXT = 'text', 'Text'
-
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='questions')
     text = models.TextField()
-    answer_type = models.CharField(max_length=20, choices=AnswerType.choices)
     base_points = models.PositiveIntegerField(default=100)
     image = models.ImageField(upload_to='questions/images/', blank=True, null=True)
     video_url = models.URLField(blank=True, null=True)
@@ -38,6 +32,7 @@ class Question(models.Model):
 class GameSession(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='sessions')
     started_at = models.DateTimeField(auto_now_add=True)
+    points_doubled = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.quiz.name} — {self.started_at:%Y-%m-%d %H:%M}"
@@ -49,6 +44,20 @@ class Team(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Score(models.Model):
+    session = models.ForeignKey(GameSession, on_delete=models.CASCADE, related_name='scores')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='scores')
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='scores', null=True, blank=True)
+    points = models.IntegerField(default=0)
+    effective_points = models.IntegerField(default=0)
+
+    class Meta:
+        unique_together = [('session', 'question')]
+
+    def __str__(self):
+        return f"{self.question} → {self.team} ({self.points}pts)"
 
 
 class Choice(models.Model):

@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Nerd Quiz — Home{% endblock %}
+{% block title %}Nerd Quiz — Übersicht{% endblock %}
 
 {% block content %}
 <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:1.5rem;">
-    <h1>Quizzes</h1>
-    <a href="{% url 'quiz_create' %}" class="btn btn-primary">+ New Quiz</a>
+    <h1>Quizze</h1>
+    <a href="{% url 'quiz_create' %}" class="btn btn-primary">+ Neues Quiz</a>
 </div>
 
 {% if quizzes %}
@@ -14,26 +14,30 @@
     <div class="card" style="display:flex; flex-direction:column; gap:0.5rem;">
         <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:0.5rem;">
             <h2 style="font-size:1.2rem;">{{ quiz.name }}</h2>
-            <a href="{% url 'quiz_edit' pk=quiz.pk %}" class="btn btn-outline" style="padding:0.3rem 0.7rem; font-size:0.8rem; flex-shrink:0;">Edit</a>
+            <a href="{% url 'quiz_edit' pk=quiz.pk %}" class="btn btn-outline" style="padding:0.3rem 0.7rem; font-size:0.8rem; flex-shrink:0;">Bearbeiten</a>
         </div>
-        <p style="font-size:0.85rem; color:var(--muted);">{{ quiz.date }}</p>
         {% if quiz.description %}
         <p style="font-size:0.9rem;">{{ quiz.description }}</p>
         {% endif %}
         <div style="display:flex; align-items:center; justify-content:space-between; margin-top:auto; padding-top:0.5rem;">
             <p style="font-size:0.85rem; color:var(--muted);">
-                {{ quiz.question_count }} question{{ quiz.question_count|pluralize }}
+                {{ quiz.question_count }} Frage{{ quiz.question_count|pluralize:"n" }}
             </p>
-            <a href="{% url 'play_start' quiz_pk=quiz.pk %}" class="btn btn-secondary" style="font-size:0.85rem; padding:0.35rem 0.85rem;">
-                ▶ Play
-            </a>
+            <div style="display:flex; gap:0.4rem;">
+                <a href="{% url 'quiz_sessions' pk=quiz.pk %}" class="btn btn-outline" style="font-size:0.85rem; padding:0.35rem 0.85rem;">
+                    Runden
+                </a>
+                <a href="{% url 'play_start' quiz_pk=quiz.pk %}" class="btn btn-secondary" style="font-size:0.85rem; padding:0.35rem 0.85rem;">
+                    ▶ Spielen
+                </a>
+            </div>
         </div>
     </div>
     {% endfor %}
 </div>
 {% else %}
 <div class="card" style="text-align:center; padding:3rem; color:var(--muted);">
-    <p style="font-size:1.1rem;">No quizzes yet — create the first one!</p>
+    <p style="font-size:1.1rem;">Noch keine Quizze — trau dich doch!</p>
 </div>
 {% endif %}
 {% endblock %}

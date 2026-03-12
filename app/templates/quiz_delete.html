@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz löschen — {{ quiz.name }}{% endblock %}
+
+{% block content %}
+<div style="max-width:480px; margin:0 auto;">
+    <div class="card" style="text-align:center; padding:2.5rem 2rem;">
+        <div style="font-size:2.5rem; margin-bottom:1rem;">⚠️</div>
+        <h1 style="font-size:1.3rem; margin-bottom:0.5rem;">Quiz wirklich löschen?</h1>
+        <p style="color:var(--muted); font-size:0.92rem; margin-bottom:0.25rem;">
+            <strong style="color:var(--dark);">{{ quiz.name }}</strong>
+        </p>
+        <p style="color:var(--muted); font-size:0.85rem; margin-bottom:2rem;">
+            Alle Kategorien, Fragen und Spielrunden werden unwiderruflich gelöscht.
+        </p>
+
+        <div style="display:flex; gap:0.75rem; justify-content:center;">
+            <a href="{% url 'quiz_edit' pk=quiz.pk %}" class="btn btn-outline">Abbrechen</a>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn" style="background:#E05555; color:#fff; border:none;">
+                    Ja, Quiz löschen
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

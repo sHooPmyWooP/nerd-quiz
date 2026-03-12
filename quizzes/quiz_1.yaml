@@ -1,0 +1,194 @@
+# Django fixture — load with: make load-fixture
+# PKs are arbitrary; just ensure FK references are consistent within this file.
+
+- model: app.quiz
+  pk: 1
+  fields:
+    name: Nerd Quiz #1
+    description: Ein Beispiel-Quiz zum Loslegen.
+
+- model: app.category
+  pk: 1
+  fields:
+    quiz: 1
+    name: Wissenschaft
+
+- model: app.category
+  pk: 2
+  fields:
+    quiz: 1
+    name: Geschichte
+
+- model: app.category
+  pk: 3
+  fields:
+    quiz: 1
+    name: Popkultur
+
+# ── Wissenschaft ──────────────────────────────────────────────────────────────
+
+- model: app.question
+  pk: 1
+  fields:
+    category: 1
+    text: Was ist das chemische Symbol für Wasser?
+    base_points: 100
+    image: ""
+    video_url: ""
+    answer_notes: H₂O — zwei Wasserstoffatome, die an ein Sauerstoffatom gebunden sind.
+
+- model: app.question
+  pk: 2
+  fields:
+    category: 1
+    text: Welcher Planet hat die meisten Monde?
+    base_points: 200
+    image: ""
+    video_url: ""
+    answer_notes: "Saturn (Stand 2023: 146 bestätigte Monde)."
+
+- model: app.choice
+  pk: 1
+  fields:
+    question: 2
+    text: Mars
+
+- model: app.choice
+  pk: 2
+  fields:
+    question: 2
+    text: Jupiter
+
+- model: app.choice
+  pk: 3
+  fields:
+    question: 2
+    text: Saturn
+
+- model: app.choice
+  pk: 4
+  fields:
+    question: 2
+    text: Uranus
+
+- model: app.question
+  pk: 3
+  fields:
+    category: 1
+    text: Wie hoch ist die Lichtgeschwindigkeit im Vakuum (in km/s)?
+    base_points: 300
+    image: ""
+    video_url: ""
+    answer_notes: Ungefähr 299.792 km/s.
+
+# ── Geschichte ────────────────────────────────────────────────────────────────
+
+- model: app.question
+  pk: 4
+  fields:
+    category: 2
+    text: In welchem Jahr fiel die Berliner Mauer?
+    base_points: 100
+    image: ""
+    video_url: ""
+    answer_notes: 1989.
+
+- model: app.question
+  pk: 5
+  fields:
+    category: 2
+    text: Wer war der erste Mensch auf dem Mond?
+    base_points: 200
+    image: ""
+    video_url: ""
+    answer_notes: Neil Armstrong, während der Apollo-11-Mission am 20. Juli 1969.
+
+- model: app.choice
+  pk: 5
+  fields:
+    question: 5
+    text: Buzz Aldrin
+
+- model: app.choice
+  pk: 6
+  fields:
+    question: 5
+    text: Neil Armstrong
+
+- model: app.choice
+  pk: 7
+  fields:
+    question: 5
+    text: Juri Gagarin
+
+- model: app.choice
+  pk: 8
+  fields:
+    question: 5
+    text: John Glenn
+
+- model: app.question
+  pk: 6
+  fields:
+    category: 2
+    text: Welches antike Weltwunder existiert noch heute?
+    base_points: 300
+    image: ""
+    video_url: ""
+    answer_notes: Die Große Pyramide von Gizeh.
+
+# ── Popkultur ─────────────────────────────────────────────────────────────────
+
+- model: app.question
+  pk: 7
+  fields:
+    category: 3
+    text: Welche fiktive Schule besucht Harry Potter?
+    base_points: 100
+    image: ""
+    video_url: ""
+    answer_notes: Hogwarts – Schule für Hexerei und Zauberei.
+
+- model: app.question
+  pk: 8
+  fields:
+    category: 3
+    text: Welcher Künstler trat am häufigsten bei der Super-Bowl-Halbzeitshow auf?
+    base_points: 200
+    image: ""
+    video_url: ""
+    answer_notes: Bruno Mars und Beyoncé (Stand 2024 je 2 Hauptauftritte).
+
+- model: app.choice
+  pk: 9
+  fields:
+    question: 8
+    text: Bruno Mars
+
+- model: app.choice
+  pk: 10
+  fields:
+    question: 8
+    text: Beyoncé
+
+- model: app.choice
+  pk: 11
+  fields:
+    question: 8
+    text: Madonna
+
+- model: app.choice
+  pk: 12
+  fields:
+    question: 8
+    text: Lady Gaga
+
+- model: app.question
+  pk: 9
+  fields:
+    category: 3
+    text: In welchem Jahr wurde das erste iPhone vorgestellt?
+    base_points: 300
+    image: ""
+    video_url: ""
+    answer_notes: 2007.

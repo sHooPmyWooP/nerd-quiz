@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Questions — {{ quiz.name }}{% endblock %}
+{% block title %}Fragen — {{ quiz.name }}{% endblock %}
 
 {% block content %}
 {% include "includes/wizard_steps.html" with current_step=3 %}
@@ -9,12 +9,13 @@
 
     <!-- ── Add question form ── -->
     <div>
-        <h1 style="margin-bottom:0.25rem;">Add Question</h1>
+        <h1 style="margin-bottom:0.25rem;">{% if editing %}Frage bearbeiten{% else %}Frage hinzufügen{% endif %}</h1>
         <p style="color:var(--muted); margin-bottom:1.5rem;">{{ quiz.name }}</p>
 
         <div class="card">
             <form method="post" enctype="multipart/form-data" style="display:flex; flex-direction:column; gap:1.1rem;">
                 {% csrf_token %}
+                {% if editing %}<input type="hidden" name="edit_pk" value="{{ editing.pk }}">{% endif %}
 
                 {% for field in form %}
                 <div style="display:flex; flex-direction:column; gap:0.3rem;">
@@ -30,9 +31,9 @@
                 </div>
                 {% endfor %}
 
-                <!-- Multiple choice options (shown/hidden via JS) -->
-                <div id="choices-section" style="display:none; flex-direction:column; gap:0.5rem;">
-                    <p style="font-weight:600; font-size:0.88rem;">Answer choices</p>
+                <!-- Multiple choice options -->
+                <div id="choices-section" style="display:flex; flex-direction:column; gap:0.5rem;">
+                    <p style="font-weight:600; font-size:0.88rem;">Antwortmöglichkeiten</p>
                     {{ choice_formset.management_form }}
                     {% for cf in choice_formset %}
                     <div>{{ cf.text }}</div>
@@ -40,7 +41,12 @@
                 </div>
 
                 <div style="display:flex; gap:0.75rem; justify-content:flex-end; margin-top:0.5rem;">
-                    <button type="submit" name="add" class="btn btn-secondary">+ Add Question</button>
+                    {% if editing %}
+                    <a href="{% url 'quiz_add_questions' quiz.pk %}" class="btn btn-outline">Abbrechen</a>
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+                    {% else %}
+                    <button type="submit" name="add" class="btn btn-secondary">+ Frage hinzufügen</button>
+                    {% endif %}
                 </div>
             </form>
         </div>
@@ -48,39 +54,72 @@
 
     <!-- ── Questions added so far ── -->
     <div>
-        <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:1.5rem;">
-            <h2 style="color:var(--dark);">Questions added</h2>
-            <span style="color:var(--muted); font-size:0.85rem;">{{ questions|length }} so far</span>
+        <h2 style="color:var(--dark); margin-bottom:1.25rem;">Fortschritt</h2>
+
+        <div class="card" style="padding:1rem; margin-bottom:1.5rem;">
+            <!-- Header row -->
+            <div class="progress-grid" style="--cols:{{ point_values|length }}">
+                <div class="pg-cat-label"></div>
+                {% for pts in point_values %}
+                <div class="pg-pts-header">{{ pts }}</div>
+                {% endfor %}
+            </div>
+            <!-- Per-category rows -->
+            {% for row in category_grid %}
+            <div class="progress-grid" style="--cols:{{ point_values|length }}">
+                <div class="pg-cat-label" title="{{ row.category.name }}">{{ row.category.name }}</div>
+                {% for slot in row.slots %}
+                <div class="pg-slot
+                    {% if slot.count == 0 %}pg-slot--missing
+                    {% elif slot.count == 1 %}pg-slot--ok
+                    {% else %}pg-slot--duplicate{% endif %}">
+                    {% if slot.count == 1 %}✓
+                    {% elif slot.count > 1 %}{{ slot.count }}
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
         </div>
 
-        {% if questions %}
         {% regroup questions by category as by_category %}
         {% for group in by_category %}
         <div style="margin-bottom:1.25rem;">
             <p style="font-weight:700; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em;
                       color:var(--orange); margin-bottom:0.5rem;">{{ group.grouper }}</p>
-            <div style="display:flex; flex-direction:column; gap:0.5rem;">
+            <div style="display:flex; flex-direction:column; gap:0.4rem;">
                 {% for q in group.list %}
-                <div class="card" style="padding:0.75rem 1rem; font-size:0.9rem;">
-                    <div style="display:flex; justify-content:space-between; gap:0.5rem;">
-                        <span>{{ q.text|truncatechars:80 }}</span>
-                        <span style="white-space:nowrap; font-size:0.8rem; color:var(--muted);">{{ q.base_points }} pts</span>
+                <div class="card q-card{% if editing.pk == q.pk %} q-card--editing{% endif %}" style="padding:0.6rem 1rem; font-size:0.88rem;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem;">
+                        <div style="min-width:0;">
+                            <div style="display:flex; gap:0.5rem; align-items:baseline;">
+                                <span style="white-space:nowrap; font-size:0.8rem; color:var(--muted);">{{ q.base_points }} pts</span>
+                                <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ q.text|truncatechars:60 }}</span>
+                            </div>
+                            {% if q.choices.exists %}<span style="font-size:0.75rem; color:var(--muted);">Multiple Choice</span>{% endif %}
+                        </div>
+                        <div style="display:flex; gap:0.3rem; flex-shrink:0;">
+                            <a href="?edit={{ q.pk }}" class="icon-btn" title="Edit">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            </a>
+                            <form method="post" style="display:contents;" onsubmit="return confirm('Frage wirklich löschen?')">
+                                {% csrf_token %}
+                                <input type="hidden" name="delete_pk" value="{{ q.pk }}">
+                                <button type="submit" class="icon-btn icon-btn--danger" title="Delete">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+                                </button>
+                            </form>
+                        </div>
                     </div>
-                    <span style="font-size:0.78rem; color:var(--muted);">{{ q.get_answer_type_display }}</span>
                 </div>
                 {% endfor %}
             </div>
         </div>
         {% endfor %}
-        {% else %}
-        <div class="card" style="text-align:center; padding:2rem; color:var(--muted);">
-            No questions yet
-        </div>
-        {% endif %}
 
         <form method="post" style="margin-top:1.5rem; text-align:right;">
             {% csrf_token %}
-            <button type="submit" name="finish" class="btn btn-primary">Finish &amp; Save Quiz ✓</button>
+            <button type="submit" name="finish" class="btn btn-primary">Quiz fertigstellen ✓</button>
         </form>
     </div>
 
@@ -89,6 +128,57 @@
 
 {% block extra_css %}{{ block.super }}
 <style>
+    .progress-grid {
+        display: grid;
+        grid-template-columns: 1fr repeat(var(--cols), 36px);
+        gap: 4px;
+        margin-bottom: 4px;
+        align-items: center;
+    }
+    .pg-cat-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding-right: 0.5rem;
+    }
+    .pg-pts-header {
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: var(--muted);
+        text-align: center;
+    }
+    .pg-slot {
+        height: 32px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+    .pg-slot--missing   { background: var(--orange-pale); color: var(--orange); }
+    .pg-slot--ok        { background: var(--green-pale);  color: var(--green); }
+    .pg-slot--duplicate { background: #FFF0F0; color: #E05555; }
+
+    .q-card { transition: background 0.15s; }
+    .q-card--editing { background: var(--orange-pale); border: 1.5px solid var(--orange); }
+
+    .icon-btn {
+        display: flex; align-items: center; justify-content: center;
+        width: 28px; height: 28px;
+        border-radius: 6px;
+        background: none; border: none; cursor: pointer;
+        color: var(--muted);
+        text-decoration: none;
+        transition: color 0.15s, background 0.15s;
+    }
+    .icon-btn:hover           { color: var(--dark);   background: #EAE5DF; }
+    .icon-btn--danger:hover   { color: #E05555;       background: #FFF0F0; }
+    .icon-btn svg             { width: 14px; height: 14px; }
+
     input[type="text"], input[type="number"], input[type="url"], textarea, select {
         width: 100%; padding: 0.5rem 0.7rem;
         border: 2px solid #E0DAD4; border-radius: 8px;
@@ -98,19 +188,4 @@
     input:focus, textarea:focus, select:focus { outline: none; border-color: var(--orange); }
     textarea { resize: vertical; min-height: 70px; }
 </style>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    const typeSelect = document.getElementById('id_answer_type');
-    const choicesSection = document.getElementById('choices-section');
-
-    function toggleChoices() {
-        choicesSection.style.display =
-            typeSelect.value === 'multiple_choice' ? 'flex' : 'none';
-    }
-
-    typeSelect.addEventListener('change', toggleChoices);
-    toggleChoices();
-</script>
 {% endblock %}

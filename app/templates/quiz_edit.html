@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Edit {{ quiz.name }} — Nerd Quiz{% endblock %}
+{% block title %}{{ quiz.name }} bearbeiten — Nerd Quiz{% endblock %}
 
 {% block content %}
 <div style="max-width:520px; margin:0 auto;">
-    <h1 style="margin-bottom:1.5rem;">Edit Quiz</h1>
+    <h1 style="margin-bottom:1.5rem;">Quiz bearbeiten</h1>
 
     <div class="card" style="margin-bottom:1rem;">
         <form method="post" style="display:flex; flex-direction:column; gap:1.2rem;">
@@ -24,18 +24,25 @@
             {% endfor %}
 
             <div style="display:flex; gap:0.75rem; justify-content:flex-end; margin-top:0.5rem;">
-                <a href="{% url 'homepage' %}" class="btn btn-outline">Cancel</a>
-                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="{% url 'homepage' %}" class="btn btn-outline">Abbrechen</a>
+                <button type="submit" class="btn btn-primary">Speichern</button>
             </div>
         </form>
     </div>
 
     <div class="card" style="display:flex; gap:0.75rem;">
         <a href="{% url 'quiz_add_categories' pk=quiz.pk %}" class="btn btn-outline" style="flex:1; text-align:center;">
-            Manage Categories
+            Kategorien verwalten
         </a>
         <a href="{% url 'quiz_add_questions' pk=quiz.pk %}" class="btn btn-outline" style="flex:1; text-align:center;">
-            Manage Questions
+            Fragen verwalten
+        </a>
+    </div>
+
+    <div style="margin-top:2rem; padding-top:1.5rem; border-top:2px solid #EAE5DF;">
+        <p style="font-size:0.85rem; color:var(--muted); margin-bottom:0.75rem;">Gefahrenzone — diese Aktion kann nicht rückgängig gemacht werden.</p>
+        <a href="{% url 'quiz_delete' pk=quiz.pk %}" class="btn" style="background:#FFF0F0; color:#E05555; border:none;">
+            Quiz löschen
         </a>
     </div>
 </div>

@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}New Quiz — Nerd Quiz{% endblock %}
+{% block title %}Neues Quiz — Nerd Quiz{% endblock %}
 
 {% block content %}
 {% include "includes/wizard_steps.html" with current_step=1 %}
 
 <div style="max-width:520px; margin:0 auto;">
-    <h1 style="margin-bottom:1.5rem;">Quiz Details</h1>
+    <h1 style="margin-bottom:1.5rem;">Quiz-Details</h1>
 
     <div class="card">
         <form method="post" style="display:flex; flex-direction:column; gap:1.2rem;">
@@ -26,8 +26,8 @@
             {% endfor %}
 
             <div style="display:flex; gap:0.75rem; justify-content:flex-end; margin-top:0.5rem;">
-                <a href="{% url 'homepage' %}" class="btn btn-outline">Cancel</a>
-                <button type="submit" class="btn btn-primary">Next: Categories &rarr;</button>
+                <a href="{% url 'homepage' %}" class="btn btn-outline">Abbrechen</a>
+                <button type="submit" class="btn btn-primary">Weiter: Kategorien &rarr;</button>
             </div>
         </form>
     </div>
