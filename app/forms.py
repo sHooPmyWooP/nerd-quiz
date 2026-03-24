@@ -29,12 +29,14 @@ CategoryFormSet = inlineformset_factory(
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
-        fields = ['category', 'text', 'base_points', 'image', 'video_url', 'answer_notes']
+        fields = ['category', 'text', 'base_points', 'image', 'audio_file', 'video_file', 'video_url', 'answer_notes']
         labels = {
             'category': 'Kategorie',
             'text': 'Frage',
             'image': 'Bild',
-            'video_url': 'Video-URL',
+            'audio_file': 'Audio-Datei',
+            'video_file': 'Video-Datei',
+            'video_url': 'Video-URL (YouTube)',
             'answer_notes': 'Antwort & Notizen',
         }
         widgets = {

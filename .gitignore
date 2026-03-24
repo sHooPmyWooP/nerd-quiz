@@ -9,8 +9,5 @@ wheels/
 # Virtual environments
 .venv
 
-# Media files
-media/
-
 # Database files
 db.sqlite3

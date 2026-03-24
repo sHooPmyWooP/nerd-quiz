@@ -14,5 +14,9 @@ urlpatterns = [
     path('session/<int:session_pk>/teams/', views.play_add_teams, name='play_add_teams'),
     path('session/<int:session_pk>/play/', views.play, name='play'),
     path('session/<int:session_pk>/award/', views.play_award, name='play_award'),
+    path('session/<int:session_pk>/grant-points/', views.play_grant_points, name='play_grant_points'),
+    path('session/<int:session_pk>/deduct/', views.play_deduct, name='play_deduct'),
     path('session/<int:session_pk>/double/', views.play_double_points, name='play_double_points'),
+    path('session/<int:session_pk>/selector/', views.play_set_selector, name='play_set_selector'),
+    path('session/<int:session_pk>/reset/', views.play_reset, name='play_reset'),
 ]

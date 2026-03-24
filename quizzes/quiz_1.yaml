@@ -81,6 +81,17 @@
     video_url: ""
     answer_notes: Ungefähr 299.792 km/s.
 
+- model: app.question
+  pk: 10
+  fields:
+    category: 1
+    text: Welches Instrument hörst du im Audio?
+    base_points: 600
+    image: ""
+    audio_file: questions/audio/test_instrument.mp3
+    video_url: ""
+    answer_notes: Beispiel-Frage mit Audio. Lege eine Datei unter media/questions/audio/test_instrument.mp3 ab.
+
 # ── Geschichte ────────────────────────────────────────────────────────────────
 
 - model: app.question

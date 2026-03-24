@@ -8,9 +8,10 @@
 <!-- ── Scoreboard ── -->
 <div class="scoreboard">
     {% for team in team_scores %}
-    <div class="score-card {% if forloop.first %}score-card--leader{% endif %}">
+    <div class="score-card {% if forloop.first %}score-card--leader{% endif %} {% if current_selector and team.pk == current_selector.pk %}score-card--selector{% endif %}">
         <span class="score-name">{{ team.name }}</span>
         <span class="score-pts">{{ team.total|default:0 }}</span>
+        {% if current_selector and team.pk == current_selector.pk %}<span class="selector-badge">Fragerecht</span>{% endif %}
     </div>
     {% endfor %}
 
@@ -19,11 +20,46 @@
         <span style="font-size:0.72rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em;">Fragen</span>
     </div>
 
-    <a href="{% url 'play_add_teams' session_pk=session.pk %}"
-       style="font-size:0.78rem; color:var(--muted); text-decoration:none; align-self:center; padding:0.3rem 0.6rem; border-radius:6px; transition:background 0.15s;"
-       onmouseover="this.style.background='#EAE5DF'" onmouseout="this.style.background='transparent'">
-        Teams bearbeiten
-    </a>
+    <div class="options-menu" style="align-self:center;">
+        <button type="button" class="btn options-toggle" id="options-btn">Optionen ▾</button>
+        <div class="options-panel" id="options-panel">
+            <a href="{% url 'play_add_teams' session_pk=session.pk %}" class="options-item">Teams bearbeiten</a>
+            <div class="options-divider"></div>
+            <div class="options-section-title">Fragerecht setzen</div>
+            <form method="post" action="{% url 'play_set_selector' session.pk %}">
+                {% csrf_token %}
+                <div class="options-team-grid">
+                    {% for team in team_scores %}
+                    <button type="submit" name="team_pk" value="{{ team.pk }}"
+                        class="btn options-team-btn {% if current_selector and team.pk == current_selector.pk %}options-team-btn--active{% endif %}">
+                        {{ team.name }}
+                    </button>
+                    {% endfor %}
+                </div>
+            </form>
+            <div class="options-divider"></div>
+            <div class="options-section-title">Bonuspunkte vergeben</div>
+            <form method="post" action="{% url 'play_grant_points' session.pk %}" class="options-bonus-form">
+                {% csrf_token %}
+                <select name="team_pk" class="options-bonus-select" required>
+                    <option value="" disabled selected>Team auswählen</option>
+                    {% for team in team_scores %}
+                    <option value="{{ team.pk }}">{{ team.name }}</option>
+                    {% endfor %}
+                </select>
+                <div class="options-bonus-row">
+                    <input type="number" name="points" step="1" value="100" class="options-bonus-input" required>
+                    <button type="submit" class="btn options-bonus-submit">Punkte buchen</button>
+                </div>
+            </form>
+            <div class="options-divider"></div>
+            <form method="post" action="{% url 'play_reset' session.pk %}"
+                  onsubmit="return confirm('Quiz wirklich zurücksetzen? Alle Punkte und Antworten werden gelöscht.')">
+                {% csrf_token %}
+                <button type="submit" class="options-item options-item--danger">Quiz zurücksetzen</button>
+            </form>
+        </div>
+    </div>
     <div>
         <form method="post" action="{% url 'play_double_points' session.pk %}">
             {% csrf_token %}
@@ -38,27 +74,30 @@
 </div>
 
 <!-- ── Question board ── -->
-<div class="board">
+<div class="board" style="grid-template-columns: repeat({{ categories|length }}, 1fr);">
     {% for category in categories %}
-    <div class="board-col">
-        <div class="board-header">{{ category.name }}</div>
-        {% for question in category.questions.all %}
-        {% with score=answered|get_item:question.pk %}
-        {% if score %}
-        <div class="board-tile board-tile--done">
-            <span class="tile-pts">{{ score.effective_points }}</span>
-            {% if score.team %}<span class="tile-winner">{{ score.team.name }}</span>{% endif %}
-        </div>
-        {% else %}
-        <a href="?question={{ question.pk }}" class="board-tile">
-            <span class="tile-pts">{{ question.base_points|multiply:multiplier }}</span>
-        </a>
-        {% endif %}
-        {% endwith %}
-        {% empty %}
-        <div class="board-tile board-tile--empty">—</div>
-        {% endfor %}
+    <div class="board-header">{{ category.name }}</div>
+    {% endfor %}
+
+    {% for row in board_rows %}
+    {% for question in row %}
+    {% if question %}
+    {% with score=answered|get_item:question.pk %}
+    {% if score %}
+    <div class="board-tile board-tile--done">
+        <span class="tile-pts">{{ score.effective_points }}</span>
+        {% if score.team %}<span class="tile-winner">{{ score.team.name }}</span>{% endif %}
     </div>
+    {% else %}
+    <a href="?question={{ question.pk }}" class="board-tile">
+        <span class="tile-pts">{{ question.base_points|multiply:multiplier }}</span>
+    </a>
+    {% endif %}
+    {% endwith %}
+    {% else %}
+    <div class="board-tile board-tile--empty">—</div>
+    {% endif %}
+    {% endfor %}
     {% endfor %}
 </div>
 
@@ -79,7 +118,19 @@
 
             {% if selected_question.image %}
             <img src="{{ selected_question.image.url }}" alt="Question image"
-                 style="max-width:100%; border-radius:8px;">
+                 style="flex:1; min-height:0; width:100%; object-fit:contain; border-radius:8px;">
+            {% endif %}
+
+            {% if selected_question.audio_file %}
+            <audio controls style="width:100%;">
+                <source src="{{ selected_question.audio_file.url }}">
+            </audio>
+            {% endif %}
+
+            {% if selected_question.video_file %}
+            <video controls style="flex:1; min-height:0; width:100%; border-radius:8px; background:#000;">
+                <source src="{{ selected_question.video_file.url }}">
+            </video>
             {% endif %}
 
             {% if selected_question.video_url %}
@@ -117,24 +168,52 @@
             {% endif %}
         </div>
 
-        <div class="modal-footer">
+        <div class="modal-footer {% if score %}modal-footer--awarded{% endif %}">
+            <div class="award-section">
+                <p style="font-weight:600; font-size:0.8rem; color:var(--muted); margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.04em;">Punkte gehen an</p>
+                {% if question_deductions %}
+                <div class="deduction-log">
+                    {% for d in question_deductions %}
+                    <span class="deduction-entry">✗ {{ d.team.name }} <span class="deduction-pts">−{{ d.points }}</span></span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <div class="award-divider">Falsch beantwortet</div>
+                <form method="post" action="{% url 'play_deduct' session.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="question_pk" value="{{ selected_question.pk }}">
+                    <div class="team-buttons">
+                        {% for team in team_scores %}
+                        <button type="submit" name="team_pk" value="{{ team.pk }}"
+                            class="btn team-btn team-btn--wrong{% if team.pk in deducted_team_ids %} team-btn--deducted{% endif %}"
+                            {% if team.pk in deducted_team_ids %}disabled{% endif %}>
+                            {{ team.name }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                </form>
+                <div class="award-divider">Richtig beantwortet</div>
+                <form method="post" action="{% url 'play_award' session.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="question_pk" value="{{ selected_question.pk }}">
+                    <div class="team-buttons">
+                        {% for team in team_scores %}
+                        {% if team.pk not in deducted_team_ids %}
+                        <button type="submit" name="team_pk" value="{{ team.pk }}" class="btn team-btn">
+                            {{ team.name }}
+                        </button>
+                        {% endif %}
+                        {% endfor %}
+                        <button type="submit" class="btn team-btn team-btn--nobody">
+                            Niemand
+                        </button>
+                    </div>
+                </form>
+            </div>
             {% if score %}
             <div class="awarded-banner">
                 ✓ Vergeben{% if score.team %} an <strong>{{ score.team.name }}</strong> ({{ score.points }} Pkt.){% else %} — niemand hat gepunktet{% endif %}
             </div>
-            {% else %}
-            <p style="font-weight:600; font-size:0.8rem; color:var(--muted); margin-bottom:0.5rem; text-transform:uppercase; letter-spacing:0.04em;">Punkte gehen an</p>
-            <form method="post" action="{% url 'play_award' session.pk %}">
-                {% csrf_token %}
-                <input type="hidden" name="question_pk" value="{{ selected_question.pk }}">
-                <div class="team-buttons">
-                    {% for team in team_scores %}
-                    <button type="submit" name="team_pk" value="{{ team.pk }}" class="btn team-btn">
-                        {{ team.name }}
-                    </button>
-                    {% endfor %}
-                </div>
-            </form>
             {% endif %}
         </div>
     </div>
@@ -166,20 +245,92 @@
         border: 2px solid transparent;
     }
     .score-card--leader { border-color: transparent; }
+    .score-card--selector { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(255,107,43,0.25), var(--shadow); }
     .score-name { font-size: 0.82rem; font-weight: 600; color: var(--muted); }
     .score-pts  { font-size: 1.5rem; font-weight: 800; color: var(--dark); }
+    .selector-badge {
+        font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+        color: var(--orange); background: var(--orange-pale); border-radius: 4px;
+        padding: 0.1rem 0.35rem; margin-top: 0.1rem;
+    }
+
+    /* ── Options menu ── */
+    .options-menu { position: relative; }
+    .options-toggle {
+        font-size: 0.78rem; font-weight: 600; background: #F0EDE8;
+        color: var(--text); border: none; padding: 0.3rem 0.75rem;
+    }
+    .options-toggle:hover { background: #E2DDD7; filter: none; }
+    .options-panel {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: calc(100% + 6px);
+        background: var(--white);
+        border-radius: 10px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        border: 1px solid #EAE5DF;
+        min-width: 200px;
+        z-index: 500;
+        padding: 0.4rem 0;
+        white-space: nowrap;
+    }
+    .options-panel.is-open { display: block; }
+    .options-item {
+        display: block; width: 100%; text-align: left; padding: 0.5rem 1rem;
+        font-size: 0.85rem; font-weight: 500; color: var(--text);
+        text-decoration: none; background: none; border: none; cursor: pointer;
+    }
+    .options-item:hover { background: #F5F2EE; }
+    .options-item--danger { color: #C0392B; }
+    .options-item--danger:hover { background: #FFF0F0; }
+    .options-divider { height: 1px; background: #EAE5DF; margin: 0.3rem 0; }
+    .options-section-title {
+        padding: 0.3rem 1rem 0.15rem;
+        font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.06em; color: var(--muted);
+    }
+    .options-team-grid { display: flex; flex-direction: column; padding: 0.2rem 0.5rem 0.4rem; gap: 0.25rem; }
+    .options-team-btn {
+        font-size: 0.82rem; padding: 0.3rem 0.6rem;
+        background: #F0EDE8; color: var(--text); border: none; font-weight: 600; text-align: left;
+    }
+    .options-team-btn:hover { background: #E2DDD7; filter: none; }
+    .options-team-btn--active { background: var(--orange); color: var(--white); }
+    .options-team-btn--active:hover { filter: brightness(1.08); }
+    .options-bonus-form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        padding: 0.2rem 0.75rem 0.45rem;
+    }
+    .options-bonus-select,
+    .options-bonus-input {
+        width: 100%;
+        border: 1px solid #D7D2CC;
+        border-radius: 6px;
+        padding: 0.35rem 0.45rem;
+        font-size: 0.82rem;
+        background: #FFF;
+    }
+    .options-bonus-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 0.35rem;
+    }
+    .options-bonus-submit {
+        font-size: 0.8rem;
+        padding: 0.35rem 0.6rem;
+        background: var(--green);
+        color: var(--white);
+        border: none;
+    }
+    .options-bonus-submit:hover { filter: brightness(1.08); }
 
     /* ── Board ── */
     .board {
-        display: flex;
+        display: grid;
         gap: 0.5rem;
-    }
-    .board-col {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 0.4rem;
-        min-width: 0;
     }
     .board-header {
         background: var(--orange);
@@ -191,6 +342,9 @@
         text-align: center;
         padding: 0.5rem 0.4rem;
         border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     .board-tile {
         background: var(--dark);
@@ -234,7 +388,7 @@
         inset: 0;
         background: rgba(10, 10, 20, 0.75);
         display: flex;
-        align-items: center;
+        align-items: stretch;
         justify-content: center;
         z-index: 1000;
         padding: 1.5rem;
@@ -245,8 +399,6 @@
         border-radius: 16px;
         box-shadow: 0 20px 60px rgba(0,0,0,0.35);
         width: 100%;
-        max-width: 600px;
-        max-height: 90vh;
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -272,17 +424,19 @@
 
     .modal-body {
         padding: 1.5rem 1.25rem;
-        overflow-y: auto;
+        overflow: hidden;
         display: flex;
         flex-direction: column;
         gap: 1rem;
         flex: 1;
+        min-height: 0;
     }
     .modal-question-text {
         font-size: 1.4rem;
         font-weight: 700;
         line-height: 1.35;
         color: var(--dark);
+        flex-shrink: 0;
     }
 
     .choice-list {
@@ -352,9 +506,12 @@
         padding: 1rem 1.25rem;
         border-top: 1px solid #EAE5DF;
         flex-shrink: 0;
+        position: relative;
     }
-    .team-buttons { display: flex; flex-direction: column; gap: 0.35rem; }
+    .modal-footer--awarded .award-section { visibility: hidden; }
+    .team-buttons { display: flex; flex-direction: row; flex-wrap: wrap; gap: 0.35rem; }
     .team-btn {
+        flex: 1 1 auto;
         justify-content: center;
         text-align: center;
         background: #F0EDE8;
@@ -364,12 +521,54 @@
         font-size: 0.88rem;
     }
     .team-btn:hover { background: #E2DDD7; filter: none; }
+    .team-btn--nobody { color: var(--muted); border: 1px dashed #C8C4BF; margin-top: 0.25rem; }
+    .team-btn--nobody:hover { background: #EAE5DF; }
+    .award-divider {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0.6rem 0 0.4rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+    }
+    .award-divider::before, .award-divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #DDD8D2;
+    }
+    .team-btn--wrong { background: #FFF0F0; color: #C0392B; border: 1px solid #F5A8A0; }
+    .team-btn--wrong:hover { background: #FFE0DE; filter: none; }
+    .team-btn--deducted { opacity: 0.4; cursor: not-allowed; }
+    .deduction-log {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        margin-bottom: 0.5rem;
+    }
+    .deduction-entry {
+        background: #FFF0F0;
+        border: 1px solid #F5A8A0;
+        border-radius: 6px;
+        padding: 0.2rem 0.5rem;
+        font-size: 0.78rem;
+        color: #C0392B;
+        font-weight: 600;
+    }
+    .deduction-pts { font-weight: 800; }
 
     .awarded-banner {
+        position: absolute;
+        inset: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         background: var(--green-pale);
         color: #1A7A47;
         border-radius: 8px;
-        padding: 0.75rem 1rem;
         font-size: 0.95rem;
         text-align: center;
     }
@@ -378,6 +577,19 @@
 
 {% block extra_js %}
 <script>
+    const optionsBtn   = document.getElementById('options-btn');
+    const optionsPanel = document.getElementById('options-panel');
+    if (optionsBtn) {
+        optionsBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            optionsPanel.classList.toggle('is-open');
+        });
+        document.addEventListener('click', function () {
+            optionsPanel.classList.remove('is-open');
+        });
+        optionsPanel.addEventListener('click', function (e) { e.stopPropagation(); });
+    }
+
     const revealBtn   = document.getElementById('reveal-btn');
     const answerNotes = document.getElementById('answer-notes');
     if (revealBtn) {

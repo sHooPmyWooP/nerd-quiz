@@ -1,8 +1,10 @@
-from django.db.models import Count, Prefetch, Sum
+from django.db.models import Count, F, OuterRef, Prefetch, Subquery, Sum, Value
+from django.db.models.functions import Coalesce
+from django.urls import reverse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import POINT_VALUES, CategoryFormSet, ChoiceFormSet, QuestionForm, QuizForm, TeamFormSet
-from .models import GameSession, Question, Quiz, Score
+from .models import Bonus, Deduction, GameSession, Question, Quiz, Score
 
 
 def homepage(request):
@@ -155,36 +157,76 @@ def play(request, session_pk):
         pk=session_pk,
     )
 
-    categories = session.quiz.categories.prefetch_related(
+    categories_qs = session.quiz.categories.prefetch_related(
         Prefetch('questions', queryset=Question.objects.order_by('base_points'))
     )
+    categories_list = list(categories_qs)
 
     scores = Score.objects.filter(session=session).select_related('team')
     answered = {s.question_id: s for s in scores}
 
+    earned_sq = Score.objects.filter(
+        session=session, team=OuterRef('pk'),
+    ).values('team').annotate(s=Sum('points')).values('s')
+    deducted_sq = Deduction.objects.filter(
+        session=session, team=OuterRef('pk'),
+    ).values('team').annotate(s=Sum('points')).values('s')
+    bonus_sq = Bonus.objects.filter(
+        session=session, team=OuterRef('pk'),
+    ).values('team').annotate(s=Sum('points')).values('s')
+
     team_scores = session.teams.annotate(
-        total=Sum('scores__points')
-    ).order_by('-total')
+        earned=Coalesce(Subquery(earned_sq), Value(0)),
+        deducted=Coalesce(Subquery(deducted_sq), Value(0)),
+        bonus=Coalesce(Subquery(bonus_sq), Value(0)),
+        total=F('earned') - F('deducted') + F('bonus'),
+    ).order_by('name')
 
     total_questions = Question.objects.filter(category__quiz=session.quiz).count()
     answered_count = len(answered)
 
+    # Build grid aligned by point value so rows stay in sync across categories
+    all_point_values = sorted({
+        q.base_points
+        for cat in categories_list
+        for q in cat.questions.all()
+    })
+    cat_question_map = {
+        cat.pk: {q.base_points: q for q in cat.questions.all()}
+        for cat in categories_list
+    }
+    board_rows = [
+        [cat_question_map.get(cat.pk, {}).get(pts) for cat in categories_list]
+        for pts in all_point_values
+    ]
+
     selected_question = None
+    question_deductions = []
+    deducted_team_ids = set()
     q_pk = request.GET.get('question')
     if q_pk:
         selected_question = get_object_or_404(
             Question, pk=q_pk, category__quiz=session.quiz
         )
+        question_deductions = list(
+            Deduction.objects.filter(session=session, question=selected_question)
+            .select_related('team').order_by('pk')
+        )
+        deducted_team_ids = {d.team_id for d in question_deductions}
 
     return render(request, 'play.html', {
         'session': session,
-        'categories': categories,
+        'categories': categories_list,
+        'board_rows': board_rows,
         'answered': answered,
         'team_scores': team_scores,
         'selected_question': selected_question,
+        'question_deductions': question_deductions,
+        'deducted_team_ids': deducted_team_ids,
         'multiplier': 2 if session.points_doubled else 1,
         'total_questions': total_questions,
         'answered_count': answered_count,
+        'current_selector': session.current_selector,
     })
 
 
@@ -203,14 +245,90 @@ def play_award(request, session_pk):
         team_pk = request.POST.get('team_pk') or None
         team = get_object_or_404(session.teams, pk=team_pk) if team_pk else None
         multiplier = 2 if session.points_doubled else 1
+        face_value = question.base_points * multiplier          # Face value (for display)
+        stolen = Deduction.objects.filter(session=session, question=question).exists()
+        awarded = face_value // 2 if stolen else face_value     # actually awarded
         Score.objects.create(
             session=session,
             question=question,
             team=team,
-            points=question.base_points * multiplier if team else 0,
-            effective_points=question.base_points * multiplier,
+            points=awarded if team else 0,
+            effective_points=face_value,
+        )
+        if team:
+            session.current_selector = team
+            session.save(update_fields=['current_selector'])
+
+    return redirect('play', session_pk=session_pk)
+
+
+def play_deduct(request, session_pk):
+    if request.method != 'POST':
+        return redirect('play', session_pk=session_pk)
+
+    session = get_object_or_404(GameSession, pk=session_pk)
+    question = get_object_or_404(
+        Question,
+        pk=request.POST.get('question_pk'),
+        category__quiz=session.quiz,
+    )
+    team = get_object_or_404(session.teams, pk=request.POST.get('team_pk'))
+
+    if not Score.objects.filter(session=session, question=question).exists():
+        multiplier = 2 if session.points_doubled else 1
+        stolen = Deduction.objects.filter(session=session, question=question).exists()
+        deduct_pts = question.base_points * multiplier // (2 if stolen else 1)
+        Deduction.objects.get_or_create(
+            session=session,
+            question=question,
+            team=team,
+            defaults={'points': deduct_pts},
         )
 
+    play_url = reverse('play', kwargs={'session_pk': session_pk})
+    return redirect(f'{play_url}?question={question.pk}')
+
+
+def play_reset(request, session_pk):
+    if request.method != 'POST':
+        return redirect('play', session_pk=session_pk)
+
+    session = get_object_or_404(GameSession, pk=session_pk)
+    Score.objects.filter(session=session).delete()
+    Deduction.objects.filter(session=session).delete()
+    Bonus.objects.filter(session=session).delete()
+    session.current_selector = None
+    session.points_doubled = False
+    session.save(update_fields=['current_selector', 'points_doubled'])
+    return redirect('play', session_pk=session_pk)
+
+
+def play_grant_points(request, session_pk):
+    if request.method != 'POST':
+        return redirect('play', session_pk=session_pk)
+
+    session = get_object_or_404(GameSession, pk=session_pk)
+    team = get_object_or_404(session.teams, pk=request.POST.get('team_pk'))
+
+    try:
+        points = int(request.POST.get('points', 0))
+    except (TypeError, ValueError):
+        points = 0
+
+    if points != 0:
+        Bonus.objects.create(session=session, team=team, points=points)
+
+    return redirect('play', session_pk=session_pk)
+
+
+def play_set_selector(request, session_pk):
+    if request.method != 'POST':
+        return redirect('play', session_pk=session_pk)
+
+    session = get_object_or_404(GameSession, pk=session_pk)
+    team_pk = request.POST.get('team_pk') or None
+    session.current_selector = get_object_or_404(session.teams, pk=team_pk) if team_pk else None
+    session.save(update_fields=['current_selector'])
     return redirect('play', session_pk=session_pk)
 
 

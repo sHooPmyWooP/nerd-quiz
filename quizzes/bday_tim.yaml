@@ -1,0 +1,240 @@
+# Django fixture — load with: make load-fixture
+# PKs are arbitrary; just ensure FK references are consistent within this file.
+
+- model: app.quiz
+  pk: 4
+  fields:
+    name: Tim Geburtstag
+    description: Ein Quiz zu Ehren von Tims Geburtstag.
+
+- model: app.category
+  pk: 21
+  fields:
+    quiz: 4
+    name: Was 4-jährige Wissen
+
+- model: app.category
+  pk: 22
+  fields:
+    quiz: 4
+    name: Das Internet ist für uns Neuland
+
+- model: app.category
+  pk: 23
+  fields:
+    quiz: 4
+    name: Popkultur der 2000er
+
+- model: app.category
+  pk: 24
+  fields:
+    quiz: 4
+    name: Zitate zuordnen
+
+# ── Was 4-jährige Wissen ──────────────────────────────────────────────────────
+
+- model: app.question
+  pk: 301
+  fields:
+    category: 21
+    text: Wer ist das?
+    base_points: 100
+    image: questions/images/marshall.jpg
+    video_url: ""
+    answer_notes: Marshall aus der Serie "Paw Patrol".
+
+- model: app.question
+  pk: 302
+  fields:
+    category: 21
+    text: Wie heißt diese weibliche Hauptfigur bei Feuerwehrmann Sam?
+    base_points: 200
+    image: questions/images/penny.jpg
+    video_url: ""
+    answer_notes: Penny.
+
+- model: app.question
+  pk: 303
+  fields:
+    category: 21
+    text: Wie heißt dieser Dinosaurier?
+    base_points: 300
+    image: questions/images/spino.webp
+    video_url: ""
+    answer_notes: Spinosaurus.
+
+- model: app.question
+  pk: 304
+  fields:
+    category: 21
+    text: Wieviele Monde hat der Jupiter? (Stand 2023, Schätzfrage!)
+    base_points: 600
+    image: ""
+    video_url: ""
+    answer_notes: 95 Monde (Stand 2023).
+
+- model: app.question
+  pk: 305
+  fields:
+    category: 21
+    text: Was ist der Unterschied zwischen Planeten und Zwergplaneten?
+    base_points: 1000
+    image: ""
+    video_url: ""
+    answer_notes: Planeten haben eine ausreichende Masse, um eine hydrostatische Gleichgewichtform zu haben und haben ihre Umlaufbahn von anderem Trümmer freigeräumt. Zwergplaneten erfüllen nur die erste Bedingung.
+
+# ── Das Internet ist für uns Neuland ──────────────────────────────────────────
+
+- model: app.question
+  pk: 306
+  fields:
+    category: 22
+    text: Wofür wurde die erste Webcam der Welt eingesetzt?
+    base_points: 100
+    image: ""
+    video_url: ""
+    answer_notes: Am University of Cambridge Computer Lab, um die Kaffeekanne zu überwachen und so unnötige Wege zu vermeiden.
+
+- model: app.question
+  pk: 307
+  fields:
+    category: 22
+    text: Wo ODER wann wurde das Internet (world wide web) erfunden?
+    base_points: 200
+    image: ""
+    video_url: ""
+    answer_notes: Am CERN in Genf, Schweiz, 1989 von Tim Berners-Lee.
+
+- model: app.question
+  pk: 308
+  fields:
+    category: 22
+    text: Was sieht man im ersten auf YouTube hochgeladenen Video?
+    base_points: 300
+    image: ""
+    video_url: ""
+    answer_notes: Jawed Karim im Zoo — das Video „Me at the zoo" vom 23. April 2005.
+
+- model: app.question
+  pk: 309
+  fields:
+    category: 22
+    text: Woher kommt der Begriff "Spam" für unerwünschte E-Mails?
+    base_points: 600
+    image: ""
+    video_url: ""
+    answer_notes: Von einem Monty Python Sketch, in dem "Spam" (eine Fleischdose) ständig wiederholt wird. Der Begriff symbolisiert damit unerwünschte Wiederholungen.
+
+- model: app.question
+  pk: 310
+  fields:
+    category: 22
+    text: Anzahl von Artikeln in der englischen Wikipedia (Stand März 2026) — Schätzfrage!
+    base_points: 1000
+    image: ""
+    video_url: ""
+    answer_notes: Ca. 6,7 Millionen Artikel (ungefähre Schätzung akzeptabel).
+
+# ── Popkultur der 2000er ──────────────────────────────────────────────────────
+
+- model: app.question
+  pk: 311
+  fields:
+    category: 23
+    text: Wer gewann die erste Staffel von "Big Brother" in Deutschland?
+    base_points: 100
+    image: ""
+    video_url: ""
+    answer_notes: Natascha Ochsenknecht (2000).
+
+- model: app.question
+  pk: 312
+  fields:
+    category: 23
+    text: Wann kam das erste iPhone auf den Markt? (Jahr reicht)
+    base_points: 200
+    image: ""
+    video_url: ""
+    answer_notes: 29. Juni 2007 (von Steve Jobs präsentiert am 9. Januar 2007).
+
+- model: app.question
+  pk: 313
+  fields:
+    category: 23
+    text: Wann war die letzte Loveparade in Berlin? (Jahr reicht)
+    base_points: 300
+    image: ""
+    video_url: ""
+    answer_notes: 2006 (danach fand sie auswärts statt, z.B. in Dortmund und Duisburg).
+
+- model: app.question
+  pk: 314
+  fields:
+    category: 23
+    text: Welcher Film gewann 2004 den Oscar für den besten Film?
+    base_points: 600
+    image: ""
+    video_url: ""
+    answer_notes: "The Return of the King"
+
+- model: app.question
+  pk: 315
+  fields:
+    category: 23
+    text: Welcher Bär hielt 2006 ganz Deutschland in Atem?
+    base_points: 1000
+    image: ""
+    video_url: ""
+    answer_notes: Bruno der Bär — ein Braunbär aus den Alpen, der 2006 auswanderte und in Bayern für Aufregung sorgte.
+
+# ── Zitate zuordnen ───────────────────────────────────────────────────────────
+
+- model: app.question
+  pk: 316
+  fields:
+    category: 24
+    text: "Eier wir brauchen Eier!"
+    base_points: 100
+    image: ""
+    video_url: ""
+    answer_notes: Oliver Kahn — während der Fußball-WM 2006 in einem Interview.
+
+- model: app.question
+  pk: 317
+  fields:
+    category: 24
+    text: „Hier steh ich, ich kann nicht anders.“
+    base_points: 300
+    image: ""
+    video_url: ""
+    answer_notes: Martin Luther, Reichstag zu Worms (1521, sinngemäß überliefert)
+
+- model: app.question
+  pk: 318
+  fields:
+    category: 24
+    text: "Jedenfalls bin ich überzeugt, daß der liebe Gott nicht würfelt."
+    base_points: 200
+    image: ""
+    video_url: ""
+    answer_notes: Albert Einstein (wobei die Urheberschaft umstritten ist).
+
+- model: app.question
+  pk: 319
+  fields:
+    category: 24
+    text: "Geld stinkt nicht."
+    base_points: 600
+    image: ""
+    video_url: ""
+    answer_notes: Vespasian, römischer Kaiser — "pecunia non olet".
+
+- model: app.question
+  pk: 320
+  fields:
+    category: 24
+    text: "Freiheit ist immer die Freiheit der Andersdenkenden."
+    base_points: 1000
+    image: ""
+    video_url: ""
+    answer_notes: Rosa Luxemburg aus "Freiheit ist immer Freiheit" (1918).
