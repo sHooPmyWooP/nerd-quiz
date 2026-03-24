@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^uvx rodney --help$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

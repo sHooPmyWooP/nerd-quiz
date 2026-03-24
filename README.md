@@ -1,5 +1,7 @@
 # Nerd Quiz
 
+<img src="docs/screenshot_homepage.png" alt="Homepage Screenshot" width="640">
+
 ## Eigenes Quiz erstellen und durchführen
 
 ### Was du brauchst
