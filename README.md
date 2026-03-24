@@ -2,6 +2,8 @@
 
 <img src="docs/screenshot_homepage.png" alt="Homepage Screenshot" width="640">
 
+<img src="docs/screenshot_play.png" alt="Quiz in Progress" width="640">
+
 ## Eigenes Quiz erstellen und durchführen
 
 ### Was du brauchst
