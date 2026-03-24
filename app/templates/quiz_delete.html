@@ -1,24 +1,29 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Quiz löschen — {{ quiz.name }}{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/quiz_forms.css' %}">
+{% endblock %}
+
 {% block content %}
-<div style="max-width:480px; margin:0 auto;">
-    <div class="card" style="text-align:center; padding:2.5rem 2rem;">
-        <div style="font-size:2.5rem; margin-bottom:1rem;">⚠️</div>
-        <h1 style="font-size:1.3rem; margin-bottom:0.5rem;">Quiz wirklich löschen?</h1>
-        <p style="color:var(--muted); font-size:0.92rem; margin-bottom:0.25rem;">
-            <strong style="color:var(--dark);">{{ quiz.name }}</strong>
+<div class="page-compact">
+    <div class="card delete-card">
+        <div class="delete-icon">!</div>
+        <h1 class="delete-title">Quiz wirklich löschen?</h1>
+        <p class="delete-name">
+            <strong>{{ quiz.name }}</strong>
         </p>
-        <p style="color:var(--muted); font-size:0.85rem; margin-bottom:2rem;">
+        <p class="delete-copy">
             Alle Kategorien, Fragen und Spielrunden werden unwiderruflich gelöscht.
         </p>
 
-        <div style="display:flex; gap:0.75rem; justify-content:center;">
+        <div class="delete-actions">
             <a href="{% url 'quiz_edit' pk=quiz.pk %}" class="btn btn-outline">Abbrechen</a>
             <form method="post">
                 {% csrf_token %}
-                <button type="submit" class="btn" style="background:#E05555; color:#fff; border:none;">
+                <button type="submit" class="btn btn-danger">
                     Ja, Quiz löschen
                 </button>
             </form>

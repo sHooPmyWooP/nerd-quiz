@@ -1,64 +1,54 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ quiz.name }} bearbeiten — Nerd Quiz{% endblock %}
 
-{% block content %}
-<div style="max-width:520px; margin:0 auto;">
-    <h1 style="margin-bottom:1.5rem;">Quiz bearbeiten</h1>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/quiz_forms.css' %}">
+{% endblock %}
 
-    <div class="card" style="margin-bottom:1rem;">
-        <form method="post" style="display:flex; flex-direction:column; gap:1.2rem;">
+{% block content %}
+<div class="page-narrow">
+    <h1 class="page-title">Quiz bearbeiten</h1>
+
+    <div class="card card-spaced">
+        <form method="post" class="form-stack">
             {% csrf_token %}
             {% for field in form %}
-            <div style="display:flex; flex-direction:column; gap:0.35rem;">
-                <label for="{{ field.id_for_label }}" style="font-weight:600; font-size:0.9rem;">
-                    {{ field.label }}{% if field.field.required %} <span style="color:var(--orange);">*</span>{% endif %}
+            <div class="field-group">
+                <label for="{{ field.id_for_label }}" class="field-label">
+                    {{ field.label }}{% if field.field.required %} <span class="required-mark">*</span>{% endif %}
                 </label>
                 {{ field }}
                 {% if field.errors %}
-                <ul style="list-style:none; color:#A63232; font-size:0.85rem;">
+                <ul class="field-errors">
                     {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
                 </ul>
                 {% endif %}
             </div>
             {% endfor %}
 
-            <div style="display:flex; gap:0.75rem; justify-content:flex-end; margin-top:0.5rem;">
+            <div class="actions-row actions-row--end">
                 <a href="{% url 'homepage' %}" class="btn btn-outline">Abbrechen</a>
                 <button type="submit" class="btn btn-primary">Speichern</button>
             </div>
         </form>
     </div>
 
-    <div class="card" style="display:flex; gap:0.75rem;">
-        <a href="{% url 'quiz_add_categories' pk=quiz.pk %}" class="btn btn-outline" style="flex:1; text-align:center;">
+    <div class="card manage-links">
+        <a href="{% url 'quiz_add_categories' pk=quiz.pk %}" class="btn btn-outline link-btn-full">
             Kategorien verwalten
         </a>
-        <a href="{% url 'quiz_add_questions' pk=quiz.pk %}" class="btn btn-outline" style="flex:1; text-align:center;">
+        <a href="{% url 'quiz_add_questions' pk=quiz.pk %}" class="btn btn-outline link-btn-full">
             Fragen verwalten
         </a>
     </div>
 
-    <div style="margin-top:2rem; padding-top:1.5rem; border-top:2px solid #EAE5DF;">
-        <p style="font-size:0.85rem; color:var(--muted); margin-bottom:0.75rem;">Gefahrenzone — diese Aktion kann nicht rückgängig gemacht werden.</p>
-        <a href="{% url 'quiz_delete' pk=quiz.pk %}" class="btn" style="background:#FFF0F0; color:#E05555; border:none;">
+    <div class="danger-zone">
+        <p class="danger-note">Gefahrenzone — diese Aktion kann nicht rückgängig gemacht werden.</p>
+        <a href="{% url 'quiz_delete' pk=quiz.pk %}" class="btn btn-danger-soft">
             Quiz löschen
         </a>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_css %}{{ block.super }}
-<style>
-    input[type="text"], input[type="date"], textarea {
-        width: 100%; padding: 0.55rem 0.75rem;
-        border: 2px solid #E0DAD4; border-radius: 8px;
-        font-size: 0.95rem; font-family: inherit;
-        transition: border-color 0.15s;
-    }
-    input[type="text"]:focus, input[type="date"]:focus, textarea:focus {
-        outline: none; border-color: var(--orange);
-    }
-    textarea { resize: vertical; min-height: 80px; }
-</style>
 {% endblock %}

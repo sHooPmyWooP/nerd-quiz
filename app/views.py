@@ -9,9 +9,17 @@ from .models import Bonus, Deduction, GameSession, Question, Quiz, Score
 
 def homepage(request):
     quizzes = Quiz.objects.annotate(
-        question_count=Count('categories__questions')
+        question_count=Count('categories__questions', distinct=True),
+        category_count=Count('categories', distinct=True),
+        sessions_count=Count('sessions', distinct=True),
     ).order_by('-id')
-    return render(request, 'homepage.html', {'quizzes': quizzes})
+
+    total_questions = sum(quiz.question_count for quiz in quizzes)
+    return render(request, 'homepage.html', {
+        'quizzes': quizzes,
+        'total_quizzes': quizzes.count(),
+        'total_questions': total_questions,
+    })
 
 
 # ── Quiz creation wizard ──────────────────────────────────────────────────────

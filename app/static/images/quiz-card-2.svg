@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" role="img" aria-label="Quiz card art two">
+  <defs>
+    <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4A1F45"/>
+      <stop offset="100%" stop-color="#7A345D"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="400" rx="24" fill="url(#g2)"/>
+  <rect x="80" y="78" width="220" height="220" rx="24" fill="#FF7A00" opacity="0.92"/>
+  <rect x="500" y="92" width="230" height="190" rx="24" fill="#FFD23F" opacity="0.9"/>
+  <path d="M350 280c38-80 70-122 162-150" stroke="#FFF8EC" stroke-width="16" stroke-linecap="round" fill="none" opacity="0.8"/>
+  <text x="400" y="348" text-anchor="middle" fill="#FFF8EC" font-size="42" font-family="'Space Mono',monospace">GAME NIGHT</text>
+</svg>

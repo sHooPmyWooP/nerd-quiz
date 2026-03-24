@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Star sticker">
+  <defs>
+    <linearGradient id="star" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFE783"/>
+      <stop offset="100%" stop-color="#FFD23F"/>
+    </linearGradient>
+  </defs>
+  <path d="M48 4L60 31L89 34L67 53L73 82L48 67L23 82L29 53L7 34L36 31Z" fill="url(#star)" stroke="#FFB700" stroke-width="5"/>
+  <circle cx="48" cy="48" r="10" fill="#FFF8EC" opacity="0.85"/>
+</svg>

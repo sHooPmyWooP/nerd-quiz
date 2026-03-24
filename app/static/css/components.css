@@ -1,0 +1,212 @@
+.card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    padding: 1.25rem;
+    border: 1px solid rgba(30, 33, 48, 0.06);
+}
+
+.btn {
+    display: inline-block;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 999px;
+    padding: 0.58rem 1.1rem;
+    font-weight: 800;
+    font-size: 0.92rem;
+    transition: transform 0.12s ease, filter 0.12s ease;
+}
+
+.btn:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn-primary {
+    color: var(--white);
+    background: linear-gradient(120deg, var(--orange), #ff9a00);
+    box-shadow: 0 6px 15px rgba(255, 122, 0, 0.25);
+}
+
+.btn-secondary {
+    color: var(--white);
+    background: linear-gradient(120deg, var(--teal), #00a0b4);
+    box-shadow: 0 6px 15px rgba(0, 184, 169, 0.24);
+}
+
+.btn-outline {
+    background: rgba(255, 255, 255, 0.7);
+    border: 2px solid rgba(255, 122, 0, 0.65);
+    color: var(--orange-deep);
+}
+
+.wizard-steps {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.wizard-step {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--muted);
+    font-size: 0.88rem;
+    font-weight: 800;
+}
+
+.wizard-step.active {
+    color: var(--orange-deep);
+}
+
+.wizard-step.done {
+    color: #0f8278;
+}
+
+.step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    font-size: 0.8rem;
+    font-weight: 800;
+    background: #e7dfd2;
+}
+
+.wizard-step.active .step-num {
+    color: var(--white);
+    background: var(--orange);
+}
+
+.wizard-step.done .step-num {
+    color: var(--white);
+    background: var(--teal);
+}
+
+.wizard-connector {
+    width: 60px;
+    max-width: 8vw;
+    height: 2px;
+    background: #d6cec0;
+    margin: 0 0.7rem;
+}
+
+input[type='text'],
+input[type='date'],
+input[type='number'],
+textarea,
+select {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    border: 2px solid #e0d7c9;
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    font-family: inherit;
+    background: #fffdf9;
+}
+
+input[type='text']:focus,
+input[type='date']:focus,
+input[type='number']:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.15);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.page-narrow {
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+.page-compact {
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.page-title {
+    margin-bottom: 1.2rem;
+}
+
+.page-subtitle {
+    color: var(--muted);
+    margin-bottom: 1.3rem;
+}
+
+.form-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.32rem;
+}
+
+.field-label {
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.required-mark {
+    color: var(--orange);
+}
+
+.field-errors {
+    list-style: none;
+    color: #a63232;
+    font-size: 0.84rem;
+}
+
+.actions-row {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.4rem;
+}
+
+.actions-row--end {
+    justify-content: flex-end;
+}
+
+.link-btn-full {
+    flex: 1;
+    text-align: center;
+}
+
+.danger-zone {
+    margin-top: 2rem;
+    padding-top: 1.3rem;
+    border-top: 2px solid #e4dbc9;
+}
+
+.danger-note {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+}
+
+.btn-danger {
+    background: #e05555;
+    color: var(--white);
+    border: none;
+}
+
+.btn-danger-soft {
+    background: #fff0f0;
+    color: #d94242;
+    border: none;
+}

@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:wght@400;600;700;800&family=Space+Mono:wght@700&display=swap');
+
+:root {
+    --bg-cream: #fff8ec;
+    --bg-dusk: #fff2dd;
+    --ink: #1e2130;
+    --ink-soft: #49506a;
+    --muted: #7b829e;
+    --orange: #ff7a00;
+    --orange-deep: #dd5e00;
+    --teal: #00b8a9;
+    --teal-soft: #ccf5f1;
+    --yellow: #ffd23f;
+    --coral: #ff5d73;
+    --white: #ffffff;
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 18px;
+    --shadow-soft: 0 6px 24px rgba(30, 33, 48, 0.09);
+    --shadow-lift: 0 10px 30px rgba(30, 33, 48, 0.14);
+
+    /* Compatibility tokens for existing page styles. */
+    --orange-light: #ff9a4d;
+    --orange-pale: #fff2dd;
+    --green: var(--teal);
+    --green-light: #36cfc2;
+    --green-pale: var(--teal-soft);
+    --dark: var(--ink);
+    --text: var(--ink);
+    --radius: var(--radius-md);
+    --shadow: var(--shadow-soft);
+}

@@ -1,0 +1,204 @@
+.home-hero {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 1rem;
+    background: linear-gradient(130deg, #1e243d, #2f3f6f);
+    color: var(--white);
+    border-radius: 22px;
+    padding: clamp(1rem, 3.5vw, 1.9rem);
+    box-shadow: var(--shadow-lift);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    margin-bottom: 1.4rem;
+    overflow: hidden;
+}
+
+.home-hero-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.8rem;
+}
+
+.home-hero h1 {
+    color: var(--white);
+    font-size: clamp(1.8rem, 3.7vw, 2.8rem);
+}
+
+.home-hero-copy {
+    font-size: 1rem;
+    max-width: 46ch;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.hero-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+.hero-chip {
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 999px;
+    padding: 0.3rem 0.65rem;
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.home-hero-visual {
+    min-height: 180px;
+    background: #17203a;
+    border-radius: 16px;
+    background-image: url('/static/images/hero-arcade.svg');
+    background-size: cover;
+    background-position: center;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.08);
+}
+
+.home-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.quiz-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.quiz-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    position: relative;
+}
+
+.quiz-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.quiz-badge {
+    font-size: 0.73rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #0f8278;
+    background: var(--teal-soft);
+    border-radius: 999px;
+    padding: 0.15rem 0.55rem;
+}
+
+.quiz-description {
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+}
+
+.quiz-meta {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.65rem;
+}
+
+.quiz-counts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    color: var(--muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.quiz-actions {
+    display: flex;
+    gap: 0.45rem;
+}
+
+.quiz-thumbnail {
+    width: 100%;
+    aspect-ratio: 16 / 8;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, #fff2dc, #ffe1ad);
+    border: 2px solid #ffd998;
+    overflow: hidden;
+    position: relative;
+}
+
+.quiz-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.quiz-thumbnail::after {
+    content: '';
+    position: absolute;
+    right: 0.35rem;
+    bottom: 0.35rem;
+    width: 36px;
+    height: 36px;
+    background: url('/static/images/sticker-star.svg') center / contain no-repeat;
+    opacity: 0.95;
+    pointer-events: none;
+}
+
+.quiz-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--ink-soft);
+    background-image: url('/static/images/sticker-star.svg');
+    background-size: 54px;
+    background-repeat: no-repeat;
+    background-position: 50% 1rem;
+}
+
+@keyframes pop-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.quiz-grid .quiz-card {
+    animation: pop-in 220ms ease both;
+}
+
+.quiz-grid .quiz-card:nth-child(2n) {
+    animation-delay: 60ms;
+}
+
+.quiz-grid .quiz-card:nth-child(3n) {
+    animation-delay: 120ms;
+}
+
+@media (max-width: 900px) {
+    .home-hero {
+        grid-template-columns: 1fr;
+    }
+
+    .home-hero-visual {
+        min-height: 150px;
+    }
+}
+
+@media (max-width: 640px) {
+    .home-title-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .home-title-row .btn {
+        text-align: center;
+    }
+}

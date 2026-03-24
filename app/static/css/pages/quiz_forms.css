@@ -1,0 +1,310 @@
+.wizard-shell {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+.section-heading {
+    margin-bottom: 0.2rem;
+}
+
+.section-subtitle {
+    color: var(--muted);
+    margin-bottom: 1.2rem;
+}
+
+.category-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.category-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.hidden-delete {
+    display: none;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.add-row-btn {
+    align-self: flex-start;
+}
+
+.non-form-errors {
+    color: #a63232;
+    font-size: 0.85rem;
+}
+
+.trash-btn {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.3rem;
+    border-radius: 8px;
+    color: var(--muted);
+    transition: color 0.15s, background 0.15s;
+    display: flex;
+    align-items: center;
+}
+
+.trash-btn:hover {
+    color: #e05555;
+    background: #fff0f0;
+}
+
+.trash-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.choice-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.choice-heading {
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.progress-card {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.progress-grid {
+    display: grid;
+    grid-template-columns: 1fr repeat(var(--cols), 36px);
+    gap: 4px;
+    margin-bottom: 4px;
+    align-items: center;
+}
+
+.pg-cat-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-right: 0.5rem;
+}
+
+.pg-pts-header {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-align: center;
+}
+
+.pg-slot {
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.pg-slot--missing {
+    background: var(--orange-pale);
+    color: var(--orange);
+}
+
+.pg-slot--ok {
+    background: var(--green-pale);
+    color: var(--green);
+}
+
+.pg-slot--duplicate {
+    background: #fff0f0;
+    color: #e05555;
+}
+
+.category-block {
+    margin-bottom: 1.25rem;
+}
+
+.category-title {
+    font-weight: 800;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--orange-deep);
+    margin-bottom: 0.5rem;
+}
+
+.question-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.q-card {
+    padding: 0.65rem 1rem;
+    font-size: 0.88rem;
+    transition: background 0.15s;
+}
+
+.q-card--editing {
+    background: var(--orange-pale);
+    border: 1.5px solid var(--orange);
+}
+
+.q-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.q-main {
+    min-width: 0;
+}
+
+.q-line {
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+}
+
+.q-points {
+    white-space: nowrap;
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+
+.q-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.q-mc {
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+
+.q-actions {
+    display: flex;
+    gap: 0.3rem;
+    flex-shrink: 0;
+}
+
+.finish-row {
+    margin-top: 1.5rem;
+    text-align: right;
+}
+
+.icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s, background 0.15s;
+}
+
+.icon-btn:hover {
+    color: var(--ink);
+    background: #e8ecff;
+}
+
+.icon-btn--danger:hover {
+    color: #e05555;
+    background: #fff0f0;
+}
+
+.icon-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+.manage-links {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.card-spaced {
+    margin-bottom: 1rem;
+}
+
+.delete-card {
+    text-align: center;
+    padding: 2.5rem 2rem;
+}
+
+.delete-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.delete-title {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+}
+
+.delete-name {
+    color: var(--muted);
+    font-size: 0.92rem;
+    margin-bottom: 0.25rem;
+}
+
+.delete-name strong {
+    color: var(--ink);
+}
+
+.delete-copy {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-bottom: 2rem;
+}
+
+.delete-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+@media (max-width: 980px) {
+    .wizard-shell {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .actions-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .actions-row .btn {
+        text-align: center;
+    }
+
+    .manage-links {
+        flex-direction: column;
+    }
+
+    .delete-actions {
+        flex-direction: column;
+    }
+}

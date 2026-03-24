@@ -1,30 +1,35 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Fragen — {{ quiz.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/quiz_forms.css' %}">
+{% endblock %}
 
 {% block content %}
 {% include "includes/wizard_steps.html" with current_step=3 %}
 
-<div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:start;">
+<div class="wizard-shell">
 
     <!-- ── Add question form ── -->
     <div>
-        <h1 style="margin-bottom:0.25rem;">{% if editing %}Frage bearbeiten{% else %}Frage hinzufügen{% endif %}</h1>
-        <p style="color:var(--muted); margin-bottom:1.5rem;">{{ quiz.name }}</p>
+        <h1 class="section-heading">{% if editing %}Frage bearbeiten{% else %}Frage hinzufügen{% endif %}</h1>
+        <p class="section-subtitle">{{ quiz.name }}</p>
 
         <div class="card">
-            <form method="post" enctype="multipart/form-data" style="display:flex; flex-direction:column; gap:1.1rem;">
+            <form method="post" enctype="multipart/form-data" class="form-stack">
                 {% csrf_token %}
                 {% if editing %}<input type="hidden" name="edit_pk" value="{{ editing.pk }}">{% endif %}
 
                 {% for field in form %}
-                <div style="display:flex; flex-direction:column; gap:0.3rem;">
-                    <label for="{{ field.id_for_label }}" style="font-weight:600; font-size:0.88rem;">
-                        {{ field.label }}{% if field.field.required %} <span style="color:var(--orange);">*</span>{% endif %}
+                <div class="field-group">
+                    <label for="{{ field.id_for_label }}" class="field-label">
+                        {{ field.label }}{% if field.field.required %} <span class="required-mark">*</span>{% endif %}
                     </label>
                     {{ field }}
                     {% if field.errors %}
-                    <ul style="list-style:none; color:#A63232; font-size:0.82rem;">
+                    <ul class="field-errors">
                         {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
                     </ul>
                     {% endif %}
@@ -32,15 +37,15 @@
                 {% endfor %}
 
                 <!-- Multiple choice options -->
-                <div id="choices-section" style="display:flex; flex-direction:column; gap:0.5rem;">
-                    <p style="font-weight:600; font-size:0.88rem;">Antwortmöglichkeiten</p>
+                <div id="choices-section" class="choice-section">
+                    <p class="choice-heading">Antwortmöglichkeiten</p>
                     {{ choice_formset.management_form }}
                     {% for cf in choice_formset %}
                     <div>{{ cf.text }}</div>
                     {% endfor %}
                 </div>
 
-                <div style="display:flex; gap:0.75rem; justify-content:flex-end; margin-top:0.5rem;">
+                <div class="actions-row actions-row--end">
                     {% if editing %}
                     <a href="{% url 'quiz_add_questions' quiz.pk %}" class="btn btn-outline">Abbrechen</a>
                     <button type="submit" class="btn btn-primary">Speichern</button>
@@ -54,11 +59,11 @@
 
     <!-- ── Questions added so far ── -->
     <div>
-        <h2 style="color:var(--dark); margin-bottom:1.25rem;">Fortschritt</h2>
+        <h2 class="page-title">Fortschritt</h2>
 
-        <div class="card" style="padding:1rem; margin-bottom:1.5rem;">
+        <div class="card progress-card">
             <!-- Header row -->
-            <div class="progress-grid" style="--cols:{{ point_values|length }}">
+            <div class="progress-grid" data-cols="{{ point_values|length }}">
                 <div class="pg-cat-label"></div>
                 {% for pts in point_values %}
                 <div class="pg-pts-header">{{ pts }}</div>
@@ -66,7 +71,7 @@
             </div>
             <!-- Per-category rows -->
             {% for row in category_grid %}
-            <div class="progress-grid" style="--cols:{{ point_values|length }}">
+            <div class="progress-grid" data-cols="{{ point_values|length }}">
                 <div class="pg-cat-label" title="{{ row.category.name }}">{{ row.category.name }}</div>
                 {% for slot in row.slots %}
                 <div class="pg-slot
@@ -84,25 +89,24 @@
 
         {% regroup questions by category as by_category %}
         {% for group in by_category %}
-        <div style="margin-bottom:1.25rem;">
-            <p style="font-weight:700; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.05em;
-                      color:var(--orange); margin-bottom:0.5rem;">{{ group.grouper }}</p>
-            <div style="display:flex; flex-direction:column; gap:0.4rem;">
+        <div class="category-block">
+            <p class="category-title">{{ group.grouper }}</p>
+            <div class="question-list">
                 {% for q in group.list %}
-                <div class="card q-card{% if editing.pk == q.pk %} q-card--editing{% endif %}" style="padding:0.6rem 1rem; font-size:0.88rem;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem;">
-                        <div style="min-width:0;">
-                            <div style="display:flex; gap:0.5rem; align-items:baseline;">
-                                <span style="white-space:nowrap; font-size:0.8rem; color:var(--muted);">{{ q.base_points }} pts</span>
-                                <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ q.text|truncatechars:60 }}</span>
+                <div class="card q-card{% if editing.pk == q.pk %} q-card--editing{% endif %}">
+                    <div class="q-row">
+                        <div class="q-main">
+                            <div class="q-line">
+                                <span class="q-points">{{ q.base_points }} pts</span>
+                                <span class="q-text">{{ q.text|truncatechars:60 }}</span>
                             </div>
-                            {% if q.choices.exists %}<span style="font-size:0.75rem; color:var(--muted);">Multiple Choice</span>{% endif %}
+                            {% if q.choices.exists %}<span class="q-mc">Multiple Choice</span>{% endif %}
                         </div>
-                        <div style="display:flex; gap:0.3rem; flex-shrink:0;">
+                        <div class="q-actions">
                             <a href="?edit={{ q.pk }}" class="icon-btn" title="Edit">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                             </a>
-                            <form method="post" style="display:contents;" onsubmit="return confirm('Frage wirklich löschen?')">
+                            <form method="post" onsubmit="return confirm('Frage wirklich löschen?')">
                                 {% csrf_token %}
                                 <input type="hidden" name="delete_pk" value="{{ q.pk }}">
                                 <button type="submit" class="icon-btn icon-btn--danger" title="Delete">
@@ -117,7 +121,7 @@
         </div>
         {% endfor %}
 
-        <form method="post" style="margin-top:1.5rem; text-align:right;">
+        <form method="post" class="finish-row">
             {% csrf_token %}
             <button type="submit" name="finish" class="btn btn-primary">Quiz fertigstellen ✓</button>
         </form>
@@ -126,66 +130,10 @@
 </div>
 {% endblock %}
 
-{% block extra_css %}{{ block.super }}
-<style>
-    .progress-grid {
-        display: grid;
-        grid-template-columns: 1fr repeat(var(--cols), 36px);
-        gap: 4px;
-        margin-bottom: 4px;
-        align-items: center;
-    }
-    .pg-cat-label {
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: var(--text);
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        padding-right: 0.5rem;
-    }
-    .pg-pts-header {
-        font-size: 0.7rem;
-        font-weight: 700;
-        color: var(--muted);
-        text-align: center;
-    }
-    .pg-slot {
-        height: 32px;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.75rem;
-        font-weight: 700;
-    }
-    .pg-slot--missing   { background: var(--orange-pale); color: var(--orange); }
-    .pg-slot--ok        { background: var(--green-pale);  color: var(--green); }
-    .pg-slot--duplicate { background: #FFF0F0; color: #E05555; }
-
-    .q-card { transition: background 0.15s; }
-    .q-card--editing { background: var(--orange-pale); border: 1.5px solid var(--orange); }
-
-    .icon-btn {
-        display: flex; align-items: center; justify-content: center;
-        width: 28px; height: 28px;
-        border-radius: 6px;
-        background: none; border: none; cursor: pointer;
-        color: var(--muted);
-        text-decoration: none;
-        transition: color 0.15s, background 0.15s;
-    }
-    .icon-btn:hover           { color: var(--dark);   background: #EAE5DF; }
-    .icon-btn--danger:hover   { color: #E05555;       background: #FFF0F0; }
-    .icon-btn svg             { width: 14px; height: 14px; }
-
-    input[type="text"], input[type="number"], input[type="url"], textarea, select {
-        width: 100%; padding: 0.5rem 0.7rem;
-        border: 2px solid #E0DAD4; border-radius: 8px;
-        font-size: 0.9rem; font-family: inherit;
-        transition: border-color 0.15s;
-    }
-    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--orange); }
-    textarea { resize: vertical; min-height: 70px; }
-</style>
+{% block extra_js %}
+<script>
+    document.querySelectorAll('.progress-grid[data-cols]').forEach(function (grid) {
+        grid.style.setProperty('--cols', grid.dataset.cols);
+    });
+</script>
 {% endblock %}

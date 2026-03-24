@@ -1,43 +1,72 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Nerd Quiz — Übersicht{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/pages/home.css' %}">
+{% endblock %}
+
 {% block content %}
-<div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:1.5rem;">
-    <h1>Quizze</h1>
+<section class="home-hero">
+    <div class="home-hero-content">
+        <h1>Nerd Quiz Night</h1>
+        <p class="home-hero-copy">
+            Erstelle eigene Quiz-Shows mit Bildern, Sound und schnellen Team-Runden.
+            Alles an einem Ort, bereit fuer den nächsten Spieleabend.
+        </p>
+        <div class="hero-stats">
+            <span class="hero-chip">{{ total_quizzes }} Quizze</span>
+            <span class="hero-chip">{{ total_questions }} Fragen im Pool</span>
+            <span class="hero-chip">Live Team Scoreboard</span>
+        </div>
+    </div>
+    <div class="home-hero-visual" aria-hidden="true"></div>
+</section>
+
+<div class="home-title-row">
+    <h2>Quiz Uebersicht</h2>
     <a href="{% url 'quiz_create' %}" class="btn btn-primary">+ Neues Quiz</a>
 </div>
 
 {% if quizzes %}
-<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1rem;">
+<div class="quiz-grid">
     {% for quiz in quizzes %}
-    <div class="card" style="display:flex; flex-direction:column; gap:0.5rem;">
-        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:0.5rem;">
-            <h2 style="font-size:1.2rem;">{{ quiz.name }}</h2>
-            <a href="{% url 'quiz_edit' pk=quiz.pk %}" class="btn btn-outline" style="padding:0.3rem 0.7rem; font-size:0.8rem; flex-shrink:0;">Bearbeiten</a>
+    <article class="card quiz-card">
+        <div class="quiz-thumbnail">
+            {% cycle 'images/quiz-card-1.svg' 'images/quiz-card-2.svg' 'images/quiz-card-3.svg' as card_art silent %}
+            <img src="{% static card_art %}" alt="Quiz Illustration">
         </div>
+
+        <div class="quiz-card-header">
+            <h2>{{ quiz.name }}</h2>
+            <a href="{% url 'quiz_edit' pk=quiz.pk %}" class="btn btn-outline">Bearbeiten</a>
+        </div>
+
+        <span class="quiz-badge">{{ quiz.category_count }} Kategorien</span>
+
         {% if quiz.description %}
-        <p style="font-size:0.9rem;">{{ quiz.description }}</p>
+        <p class="quiz-description">{{ quiz.description }}</p>
+        {% else %}
+        <p class="quiz-description">Dieses Quiz wartet noch auf eine knackige Beschreibung.</p>
         {% endif %}
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:auto; padding-top:0.5rem;">
-            <p style="font-size:0.85rem; color:var(--muted);">
-                {{ quiz.question_count }} Frage{{ quiz.question_count|pluralize:"n" }}
+
+        <div class="quiz-meta">
+            <p class="quiz-counts">
+                <span>{{ quiz.question_count }} Frage{{ quiz.question_count|pluralize:"n" }}</span>
+                <span>{{ quiz.sessions_count }} Runde{{ quiz.sessions_count|pluralize:"n" }}</span>
             </p>
-            <div style="display:flex; gap:0.4rem;">
-                <a href="{% url 'quiz_sessions' pk=quiz.pk %}" class="btn btn-outline" style="font-size:0.85rem; padding:0.35rem 0.85rem;">
-                    Runden
-                </a>
-                <a href="{% url 'play_start' quiz_pk=quiz.pk %}" class="btn btn-secondary" style="font-size:0.85rem; padding:0.35rem 0.85rem;">
-                    ▶ Spielen
-                </a>
+            <div class="quiz-actions">
+                <a href="{% url 'quiz_sessions' pk=quiz.pk %}" class="btn btn-outline">Runden</a>
+                <a href="{% url 'play_start' quiz_pk=quiz.pk %}" class="btn btn-secondary">Spielen</a>
             </div>
         </div>
-    </div>
+    </article>
     {% endfor %}
 </div>
 {% else %}
-<div class="card" style="text-align:center; padding:3rem; color:var(--muted);">
-    <p style="font-size:1.1rem;">Noch keine Quizze — trau dich doch!</p>
+<div class="card quiz-empty">
+    <p>Noch keine Quizze - trau dich und erstelle dein erstes!</p>
 </div>
 {% endif %}
 {% endblock %}

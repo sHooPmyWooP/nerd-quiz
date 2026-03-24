@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">Arcade quiz hero</title>
+  <desc id="desc">Playful illustration with quiz tiles, buzzer, and confetti.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2B3360"/>
+      <stop offset="100%" stop-color="#1B223F"/>
+    </linearGradient>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FF8C1A"/>
+      <stop offset="100%" stop-color="#FF6B00"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="700" rx="40" fill="url(#bg)"/>
+
+  <g opacity="0.22" fill="#FFFFFF">
+    <circle cx="90" cy="82" r="7"/>
+    <circle cx="220" cy="56" r="5"/>
+    <circle cx="310" cy="128" r="4"/>
+    <circle cx="1130" cy="90" r="8"/>
+    <circle cx="990" cy="50" r="4"/>
+    <circle cx="860" cy="110" r="6"/>
+  </g>
+
+  <g transform="translate(105 150)">
+    <rect width="550" height="355" rx="24" fill="#111732" stroke="#3A4474" stroke-width="8"/>
+    <g transform="translate(28 28)">
+      <rect width="150" height="88" rx="15" fill="url(#tile)"/>
+      <text x="75" y="58" fill="#FFF8EC" text-anchor="middle" font-family="'Space Mono', monospace" font-size="40" font-weight="700">100</text>
+      <rect x="170" width="150" height="88" rx="15" fill="url(#tile)"/>
+      <text x="245" y="58" fill="#FFF8EC" text-anchor="middle" font-family="'Space Mono', monospace" font-size="40" font-weight="700">100</text>
+      <rect x="340" width="150" height="88" rx="15" fill="url(#tile)"/>
+      <text x="415" y="58" fill="#FFF8EC" text-anchor="middle" font-family="'Space Mono', monospace" font-size="40" font-weight="700">100</text>
+
+      <rect y="110" width="150" height="88" rx="15" fill="#1F294D" stroke="#445188" stroke-width="4"/>
+      <text x="75" y="168" fill="#80EADA" text-anchor="middle" font-family="'Space Mono', monospace" font-size="40" font-weight="700">200</text>
+      <rect x="170" y="110" width="150" height="88" rx="15" fill="#1F294D" stroke="#445188" stroke-width="4"/>
+      <text x="245" y="168" fill="#80EADA" text-anchor="middle" font-family="'Space Mono', monospace" font-size="40" font-weight="700">200</text>
+      <rect x="340" y="110" width="150" height="88" rx="15" fill="#1F294D" stroke="#445188" stroke-width="4"/>
+      <text x="415" y="168" fill="#80EADA" text-anchor="middle" font-family="'Space Mono', monospace" font-size="40" font-weight="700">200</text>
+
+      <rect y="220" width="490" height="88" rx="15" fill="#2C3667"/>
+      <text x="245" y="277" fill="#FFD23F" text-anchor="middle" font-family="'Bungee', sans-serif" font-size="44">NERD QUIZ</text>
+    </g>
+  </g>
+
+  <g transform="translate(760 165)">
+    <ellipse cx="130" cy="340" rx="170" ry="34" fill="#121933"/>
+    <rect x="55" y="255" width="150" height="100" rx="20" fill="#2F3A69" stroke="#4C5B9A" stroke-width="7"/>
+    <rect x="90" y="290" width="80" height="18" rx="9" fill="#121933"/>
+    <circle cx="130" cy="248" r="52" fill="#FF5D73"/>
+    <circle cx="130" cy="248" r="37" fill="#FF7F92"/>
+    <circle cx="130" cy="248" r="22" fill="#FFD9DF"/>
+  </g>
+
+  <g transform="translate(750 75)" fill="#FFD23F">
+    <path d="M0 20L20 20L28 0L36 20L56 20L40 32L46 52L28 40L10 52L16 32Z"/>
+  </g>
+  <g transform="translate(1020 195)" fill="#00B8A9">
+    <path d="M0 16L16 16L22 0L28 16L44 16L32 26L36 42L22 31L8 42L12 26Z"/>
+  </g>
+  <g transform="translate(700 350)" fill="#FF7A00">
+    <path d="M0 14L14 14L20 0L26 14L40 14L30 23L34 36L20 27L6 36L10 23Z"/>
+  </g>
+</svg>

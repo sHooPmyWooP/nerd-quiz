@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" role="img" aria-label="Quiz card art three">
+  <defs>
+    <linearGradient id="g3" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#173C3A"/>
+      <stop offset="100%" stop-color="#206B65"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="400" rx="24" fill="url(#g3)"/>
+  <g fill="#FFF8EC" opacity="0.2">
+    <circle cx="120" cy="86" r="10"/>
+    <circle cx="200" cy="126" r="7"/>
+    <circle cx="260" cy="64" r="6"/>
+    <circle cx="710" cy="70" r="8"/>
+    <circle cx="650" cy="124" r="6"/>
+  </g>
+  <rect x="90" y="184" width="620" height="150" rx="20" fill="#0F2624" opacity="0.78"/>
+  <text x="400" y="252" text-anchor="middle" fill="#FFD23F" font-size="52" font-family="'Bungee',sans-serif">PLAY</text>
+  <text x="400" y="305" text-anchor="middle" fill="#D9FFF8" font-size="34" font-family="'Space Mono',monospace">TRIVIA MODE</text>
+</svg>
